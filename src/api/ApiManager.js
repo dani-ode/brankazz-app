@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+import {BRANKAZZ_BASE_URL} from '@env';
+
 const ApiManager = axios.create({
-  baseURL: 'https://brankazz.corpo.id/api',
+  baseURL: BRANKAZZ_BASE_URL,
   responseType: 'json',
   withCredentials: true,
 });

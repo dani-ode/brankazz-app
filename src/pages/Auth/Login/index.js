@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   Button,
+  KeyboardAvoidingView,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -30,14 +31,31 @@ class Login extends React.Component {
       password: '',
       isLoading: false,
     };
+    this.getOnboarding();
     this.getData();
   }
 
+  getOnboarding = async () => {
+    try {
+      const value = await AsyncStorage.getItem('onboarding');
+      if (!value) {
+        this.props.navigation.dispatch(StackActions.replace('Onboarding'));
+      } else {
+        console.log(value);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   getData = async () => {
     try {
+      console.log('get user data');
       const value = await AsyncStorage.getItem('bearer-token');
       if (value !== null) {
         this.props.navigation.dispatch(StackActions.replace('Pages'));
+      } else {
+        console.log('user not logged in');
       }
     } catch (e) {
       console.error(e);
@@ -46,22 +64,39 @@ class Login extends React.Component {
 
   handleLogin = async () => {
     try {
+      console.log('trying to login ...');
       this.setState({isLoading: true});
 
       const {email, password} = this.state;
       await user_login(email, password).then(res => {
         if (res.status === 200) {
+          console.log('stroed user');
           AsyncStorage.setItem('user-id', JSON.stringify(res.data.data.id));
           AsyncStorage.setItem('user-key', res.data.data.key);
           AsyncStorage.setItem('bearer-token', res.data.data.token);
+          // console.log(res.data.data);
 
+          console.log('logged in');
           this.props.navigation.dispatch(StackActions.replace('Pages'));
+        } else {
+          this.setState({isLoading: false});
+          console.log('failed to login');
+          this.setState({isLoading: false});
         }
       });
     } catch (error) {
+      console.log('failed to login');
       this.setState({isLoading: false});
       console.error(error);
     }
+  };
+
+  handleSignUp = () => {
+    this.props.navigation.navigate('Register');
+  };
+
+  handleForgotPassword = () => {
+    this.props.navigation.navigate('ForgotPassword');
   };
 
   render() {
@@ -79,28 +114,42 @@ class Login extends React.Component {
           <View style={styles.spacer} />
           <Layout style={styles.layout}>
             <Card style={styles.card}>
-              <TextInput
-                style={styles.input}
-                placeholder="Email"
-                onChangeText={email => this.setState({email})}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                placeholderTextColor={theme['color-primary-500']}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Password"
-                onChangeText={password => this.setState({password})}
-                placeholderTextColor={theme['color-primary-500']}
-                secureTextEntry
-              />
-              <TouchableOpacity
-                style={styles.button}
-                onPress={this.handleLogin}>
-                <Text style={styles.buttonText}>
-                  <MaterialCommunityIcons name="lock" size={16} /> Login
+              <KeyboardAvoidingView enabled>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Email"
+                  onChangeText={email => this.setState({email})}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  placeholderTextColor={theme['color-primary-500']}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Password"
+                  onChangeText={password => this.setState({password})}
+                  placeholderTextColor={theme['color-primary-500']}
+                  secureTextEntry
+                />
+
+                <TouchableOpacity onPress={this.handleForgotPassword}>
+                  <Text style={styles.forgotText}>Lupa Password?</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={this.handleLogin}>
+                  <Text style={styles.buttonText}>
+                    <MaterialCommunityIcons name="lock" size={16} /> LOGIN
+                  </Text>
+                </TouchableOpacity>
+
+                <Text style={styles.buttonSignUpText}>
+                  <TouchableOpacity
+                    style={styles.signUpButton}
+                    onPress={this.handleSignUp}>
+                    <Text style={styles.signUpText}>Belum Punya Akun? </Text>
+                  </TouchableOpacity>
                 </Text>
-              </TouchableOpacity>
+              </KeyboardAvoidingView>
             </Card>
           </Layout>
         </ScrollView>
@@ -180,9 +229,33 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   buttonText: {
-    color: theme['color-dark-500'],
+    color: theme['color-secondary-800'],
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  forgotText: {
+    // color: theme['color-primary-500'],
+    textAlign: 'right',
+    marginTop: -5,
+    color: theme['color-secondary-400'],
+    fontSize: 13,
+  },
+
+  signUpButton: {
+    backgroundColor: theme['color-primary-500'],
+    // paddingVertical: 5,
+    paddingHorizontal: 0,
+    borderRadius: 4,
+    paddingVertical: 0,
+  },
+  buttonSignUpText: {
+    color: theme['color-dark-gray-500'],
+    textAlign: 'center',
+    marginTop: 13,
+  },
+  signUpText: {
+    color: theme['color-secondary-500'],
+    fontWeight: 'bold',
   },
 });
 

@@ -1,5 +1,7 @@
 import ApiManager from './ApiManager';
 
+import {BRANKAZZ_ACCESS_KEY} from '@env';
+
 const transaction_price_list = async (
   category,
   brand,
@@ -8,22 +10,19 @@ const transaction_price_list = async (
   userBearerToken,
 ) => {
   try {
-    const res = await ApiManager.get(
-      'https://brankazz.corpo.id/api/transaction/price-list',
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Key': '3c956f3ef687c89695873c277f1098c1',
-          'User-Key': userKey,
-          Authorization: 'Bearer ' + userBearerToken,
-        },
-        params: {
-          product_category: category,
-          product_brand: brand,
-          product_sku_code_type: buyerSkuCodeType,
-        },
+    const res = await ApiManager.get('/api/transaction/price-list', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Key': BRANKAZZ_ACCESS_KEY,
+        'User-Key': userKey,
+        Authorization: 'Bearer ' + userBearerToken,
       },
-    );
+      params: {
+        product_category: category,
+        product_brand: brand,
+        product_sku_code_type: buyerSkuCodeType,
+      },
+    });
     return res;
   } catch (error) {
     console.error(error);
@@ -31,18 +30,19 @@ const transaction_price_list = async (
 };
 
 const transaction_create = async (
-  product_sku_code,
   dest_number,
+  product_sku_code,
   category,
   product_type,
   for_type,
+  amount,
   userKey,
   userBearerToken,
 ) => {
   try {
     const config = {
       headers: {
-        'Access-Key': '3c956f3ef687c89695873c277f1098c1',
+        'Access-Key': BRANKAZZ_ACCESS_KEY,
         'User-Key': userKey,
         Authorization: `Bearer ${userBearerToken}`,
       },
@@ -54,12 +54,13 @@ const transaction_create = async (
       product_category: category,
       product_brand: product_type,
       product_type: for_type,
+      amount: amount,
     };
 
-    // console.log(bodyParameters);
+    console.log(bodyParameters);
 
     const res = await ApiManager.post(
-      'https://brankazz.corpo.id/api/transaction',
+      '/api/transaction',
       bodyParameters,
       config,
     );
@@ -68,5 +69,60 @@ const transaction_create = async (
     console.error(error);
   }
 };
+const transaction_show = async (id, userKey, userBearerToken) => {
+  try {
+    const res = await ApiManager.get('/api/transaction/' + id, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Key': BRANKAZZ_ACCESS_KEY,
+        'User-Key': userKey,
+        Authorization: 'Bearer ' + userBearerToken,
+      },
+    });
+    return res;
+  } catch (error) {
+    console.error(error);
+  }
+};
+const account_ref = async (
+  userKey,
+  userBearerToken,
+  number,
+  product_sku_code,
+  brand,
+) => {
+  console.log(userKey, userBearerToken, number, product_sku_code, brand);
+  try {
+    const config = {
+      headers: {
+        'Access-Key': BRANKAZZ_ACCESS_KEY,
+        'User-Key': userKey,
+        Authorization: `Bearer ${userBearerToken}`,
+      },
+    };
 
-export {transaction_price_list, transaction_create};
+    const bodyParameters = {
+      number: number,
+      product_sku_code: product_sku_code,
+      brand: brand,
+    };
+
+    console.log(bodyParameters);
+
+    const res = await ApiManager.post(
+      '/api/check-account-name',
+      bodyParameters,
+      config,
+    );
+    // console.log(res);
+    return res;
+  } catch (error) {
+    console.error(error);
+  }
+};
+export {
+  transaction_price_list,
+  transaction_create,
+  transaction_show,
+  account_ref,
+};

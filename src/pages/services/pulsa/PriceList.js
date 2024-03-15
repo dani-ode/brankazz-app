@@ -131,20 +131,21 @@ const ProductItem = ({product, onPress}) => {
       <Card style={{backgroundColor: '#F1F5F7'}}>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <View style={{flexDirection: 'column'}}>
-            <Text style={{color: '#2e3d49'}}>{product.product_name}</Text>
+            <Text style={{color: '#2e3d49', fontWeight: 'bold'}}>
+              {product.product_name}
+            </Text>
             <Text style={{fontWeight: 'light', color: '#57636d', fontSize: 11}}>
               Layanan {product.end_cut_off} s/d {product.start_cut_off}
             </Text>
           </View>
           <Text
             style={{
-              fontWeight: 'bold',
               color: '#2e3d49',
               marginLeft: 10,
               alignContent: 'flex-end',
               alignSelf: 'flex-end',
             }}>
-            Rp {formatCurrency(product.price)}
+            {formatCurrency(product.price)}
           </Text>
         </View>
       </Card>

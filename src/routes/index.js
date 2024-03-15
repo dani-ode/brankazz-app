@@ -7,21 +7,37 @@ import {
   Login,
   Register,
   ForgotPassword,
+  Onboarding,
   Home,
-  Mutasi,
   Promo,
   Profile,
   Qris,
+  MutasiDepositScreen,
+  MutasiTransactionScreen,
 } from '../pages';
+import InputAccNumber from '../pages/services/transfer/InputAccNumber';
+import CheckoutKmp from '../pages/services/transfer/CheckoutKmp';
+
 import InputNumber from '../pages/services/pulsa/InputNumber';
 import PriceList from '../pages/services/pulsa/PriceList';
 import CheckOut from '../pages/services/pulsa/CheckOut';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {StyleSheet, View} from 'react-native';
+import SelectSeller from '../pages/Exchange/SelectSeller';
+import BidQueue from '../pages/Exchange/BidQueue';
+
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
+import TransactionDetail from '../pages/Mutasi/Transaction/TransactionDetail';
+import FintechList from '../pages/services/emoney/FintechList';
+import InputEwalletNumber from '../pages/services/emoney/InputEwalletNumber';
+import InputEwalletNominal from '../pages/services/emoney/InputEwalletNominal';
+import InputMeterNumber from '../pages/services/pln/InputMeterNumber';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+
+const TopTab = createMaterialTopTabNavigator();
 
 const Pages = () => (
   <Tab.Navigator
@@ -60,8 +76,9 @@ const Pages = () => (
     />
     <Tab.Screen
       name="Mutasi"
-      component={Mutasi}
+      component={MutasiPages}
       options={{
+        headerShown: false,
         tabBarIcon: ({focused}) => (
           <MaterialCommunityIcons
             name="archive"
@@ -152,6 +169,23 @@ const Pages = () => (
   </Tab.Navigator>
 );
 
+const MutasiPages = () => (
+  <TopTab.Navigator
+    screenOptions={{
+      // indicatorStyle: {
+      //   backgroundColor: '#FFF',
+      //   height: 4,
+      // },
+      tabBarLabelStyle: {fontSize: 12, color: '#FFF'},
+      // tabBarItemStyle: {width: 100},
+      tabBarStyle: {backgroundColor: '#2e3d49'},
+      // textColor: 'white',
+    }}>
+    <TopTab.Screen name="Dana Keluar" component={MutasiTransactionScreen} />
+    <TopTab.Screen name="Dana Masuk" component={MutasiDepositScreen} />
+  </TopTab.Navigator>
+);
+
 export class Routes extends Component {
   render() {
     return (
@@ -166,15 +200,72 @@ export class Routes extends Component {
             component={Login}
             options={{headerShown: false}}
           />
-          <Stack.Screen name="Register" component={Register} />
-          <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+          <Stack.Screen
+            name="Onboarding"
+            component={Onboarding}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Register"
+            component={Register}
+            options={{title: ''}}
+          />
+          <Stack.Screen
+            name="ForgotPassword"
+            component={ForgotPassword}
+            options={{title: 'Lupa Password'}}
+          />
           <Stack.Screen
             name="Pages"
             component={Pages}
             options={{headerShown: false}}
           />
 
-          {/* services */}
+          {/* Exchange */}
+
+          <Stack.Screen
+            name="ExchangeSelectSeller"
+            component={SelectSeller}
+            options={{title: 'Exchange'}}
+            initialParams={{
+              account_number: '',
+              ask_quantity: '',
+              ask_price: '',
+              user_name: '',
+            }}
+          />
+
+          <Stack.Screen
+            name="ExchangeBidQueue"
+            component={BidQueue}
+            options={{title: 'Antrian Penawaran'}}
+          />
+
+          {/* services ---------------- */}
+
+          {/* Transfer KMP coin */}
+          <Stack.Screen
+            name="ServiceTransferInputNumber"
+            component={InputAccNumber}
+            options={{title: 'Transfer KMP'}}
+            initialParams={{
+              user_balance: '',
+              category: '',
+            }}
+          />
+          <Stack.Screen
+            name="ServiceTransferCheckout"
+            component={CheckoutKmp}
+            options={{title: 'Masukkan nominal'}}
+            initialParams={{
+              user_balance: '',
+              category: '',
+              brand: '',
+              type: '',
+              number: '',
+              partner_name: '',
+            }}
+          />
 
           {/* Pulsa */}
           <Stack.Screen
@@ -213,6 +304,73 @@ export class Routes extends Component {
               user_balance: '',
             }}
           />
+
+          {/* PLN */}
+          <Stack.Screen
+            name="ServicePlnInputMeterNumber"
+            component={InputMeterNumber}
+            options={{title: 'Masukkan Nomor'}}
+            initialParams={{
+              user_balance: '',
+              category: '',
+            }}
+          />
+
+          {/* E-Wallet */}
+          <Stack.Screen
+            name="ServiceEwaletFintechList"
+            component={FintechList}
+            options={{title: 'Pilih E-Wallet'}}
+            initialParams={{
+              user_balance: '',
+              category: '',
+            }}
+          />
+          <Stack.Screen
+            name="ServiceEwaletInputNumber"
+            component={InputEwalletNumber}
+            options={{title: 'Masukkan Nomor'}}
+            initialParams={{
+              user_balance: '',
+              category: '',
+              brand: '',
+              code: '',
+            }}
+          />
+          <Stack.Screen
+            name="ServiceEwalletInputNominal"
+            component={InputEwalletNominal}
+            options={{title: 'Masukkan Nomor'}}
+            initialParams={{
+              user_balance: '',
+              category: '',
+              brand: '',
+              code: '',
+              number: '',
+              name: '',
+              code: '',
+            }}
+          />
+
+          {/* End services ---------------- */}
+
+          {/* Mutasi transaction detail */}
+          <Stack.Screen
+            name="TransactionDetail"
+            component={TransactionDetail}
+            options={{title: 'Transaction Detail'}}
+            initialParams={{
+              id: '',
+            }}
+          />
+          {/* <Stack.Screen
+            name="DepositDetail"
+            component={DepositDetail}
+            options={{title: 'Deposit Detail'}}
+            initialParams={{
+              id: '',
+            }}
+          /> */}
         </Stack.Navigator>
       </>
     );

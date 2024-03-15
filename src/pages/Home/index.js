@@ -23,11 +23,13 @@ import {default as theme} from '../../../theme.json';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {RefreshControl} from 'react-native-gesture-handler';
 
-import {Bounce, Plane} from 'react-native-animated-spinkit';
-
 const HomeScreen = () => {
   useEffect(() => {
     getUser();
+    const interval = setInterval(() => {
+      getUser();
+    }, 2500);
+    return () => clearInterval(interval);
   }, []);
 
   const navigation = useNavigation();
@@ -51,6 +53,9 @@ const HomeScreen = () => {
         if (res.status === 200) {
           setUser(res.data.data);
           setLoading(false);
+        } else {
+          AsyncStorage.clear();
+          navigation.replace('Login');
         }
       });
     } catch (error) {
@@ -87,11 +92,6 @@ const HomeScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar />
-      {/* <Bounce
-        size={48}
-        color={theme['color-secondary-500']}
-        style={[styles.spinkitLoader, {display: isLoading ? 'flex' : 'none'}]}
-      /> */}
       <ScrollView
         refreshControl={
           <RefreshControl refreshing={isLoading} onRefresh={handleRefresh} />
@@ -116,7 +116,7 @@ const HomeScreen = () => {
             <View style={[styles.row, styles.headerBalance]}>
               <View style={styles.col}>
                 <Text category="h6" style={styles.balance}>
-                  Rp {formatCurrency(parseInt(user.balance))},00
+                  KMP {formatCurrency(parseInt(user.balance))},00
                 </Text>
               </View>
               <View style={[styles.col, styles.deposit]}>
@@ -127,7 +127,12 @@ const HomeScreen = () => {
                       size={16}
                       color={theme['color-secondary-800']}
                     />
-                    <Text style={styles.depositTitle}> Exchange</Text>
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigation.navigate('ExchangeSelectSeller')
+                      }>
+                      <Text style={styles.depositTitle}> Exchange</Text>
+                    </TouchableOpacity>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -135,7 +140,16 @@ const HomeScreen = () => {
 
             <Card style={styles.card}>
               <View style={[styles.row, styles.serviceList]}>
-                <TouchableOpacity style={styles.service}>
+                <TouchableOpacity
+                  style={styles.service}
+                  onPress={() =>
+                    handleService({
+                      navigation,
+                      category: 'Transfer',
+                      navigation_screen: 'ServiceTransferInputNumber',
+                      user_balance,
+                    })
+                  }>
                   <View style={[styles.col]}>
                     <View style={[styles.serviceIcon, styles.serviceItem]}>
                       <MaterialCommunityIcons
@@ -170,7 +184,16 @@ const HomeScreen = () => {
                   </View>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.service}>
+                <TouchableOpacity
+                  style={styles.service}
+                  onPress={() =>
+                    handleService({
+                      navigation,
+                      category: 'pln',
+                      navigation_screen: 'ServicePlnInputMeterNumber',
+                      user_balance,
+                    })
+                  }>
                   <View style={[styles.col]}>
                     <View style={[styles.serviceIcon, styles.serviceItem]}>
                       <MaterialCommunityIcons
@@ -209,7 +232,16 @@ const HomeScreen = () => {
             />
 
             <View style={[styles.row, styles.serviceListAll]}>
-              <TouchableOpacity style={styles.service}>
+              <TouchableOpacity
+                style={styles.service}
+                onPress={() =>
+                  handleService({
+                    navigation,
+                    category: 'e_wallet',
+                    navigation_screen: 'ServiceEwaletFintechList',
+                    user_balance,
+                  })
+                }>
                 <View style={[styles.col]}>
                   <View style={[styles.serviceIcon, styles.serviceItemAll]}>
                     <MaterialCommunityIcons
@@ -379,9 +411,19 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     backgroundColor: theme['color-dark-gray-600'],
     borderColor: theme['color-primary-700'],
-    borderRightWidth: 0,
-    borderBottomWidth: 0,
+    // borderRightWidth: 0,
+    // borderBottomWidth: 0,
     borderRadius: 10,
+    shadowOffset: {
+      width: 20,
+      height: 20,
+    },
+    shadowOpacity: 0.1,
+    shadowColor: theme['color-dark-100'],
+    shadowRadius: 20,
+    elevation: 3,
+
+    shadowRadius: 20,
   },
 
   header: {
@@ -456,8 +498,8 @@ const styles = StyleSheet.create({
     width: 54,
     height: 54,
 
-    borderRightWidth: 0,
-    borderBottomWidth: 0,
+    borderRightColor: theme['color-dark-gray-800'],
+    borderBottomColor: theme['color-dark-gray-800'],
   },
 
   serviceIcon: {

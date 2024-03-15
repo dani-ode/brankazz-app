@@ -1,8 +1,8 @@
-import {View, Text, StyleSheet} from 'react-native';
-import React from 'react';
+import {View, Text, StyleSheet, Alert} from 'react-native';
+import React, {useEffect, useState} from 'react';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {transaction_create} from '../../../api/transaction_api';
+import {account_ref, transaction_create} from '../../../api/transaction_api';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Card} from '@ui-kitten/components';
 
@@ -10,7 +10,12 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 import {default as theme} from '../../../../theme.json';
 
-const CheckOut = ({route}) => {
+// import {Table, Row, Rows} from 'react-native-table-component';
+import {user_profile} from '../../../api/user_api';
+
+import {Bounce} from 'react-native-animated-spinkit';
+
+const CheckOut = ({route, navigation}) => {
   const {
     number,
     category,
@@ -21,33 +26,132 @@ const CheckOut = ({route}) => {
     user_balance,
   } = route.params;
 
-  const submit = async (product_sku_code, number, category, brand, type) => {
-    const userKey = await AsyncStorage.getItem('user-key');
-    const userBearerToken = await AsyncStorage.getItem('bearer-token');
+  const [user, setUser] = useState([['-', '-', '-']]);
 
-    console.log(
-      product_sku_code,
-      number,
-      category,
-      brand,
-      type,
-      userKey,
-      userBearerToken,
-    );
+  const [isLoading, setLoading] = useState(true);
 
+  const [meterDetail, setMeterDetail] = useState({});
+  const [meterName, setMeterName] = useState('naN');
+  const [meterId, setMeterId] = useState('0');
+  const [meterPower, setMeterPower] = useState('0');
+
+  useEffect(() => {
+    getUser();
+
+    if (brand === 'PLN') {
+      getMeterDetail();
+      const interval = setInterval(() => {
+        getMeterDetail();
+      }, 2500);
+      return () => clearInterval(interval);
+    }
+  }, []);
+
+  const getUser = async () => {
     try {
-      await transaction_create(
-        product_sku_code,
+      const userId = await AsyncStorage.getItem('user-id');
+      const userKey = await AsyncStorage.getItem('user-key');
+      const userBearerToken = await AsyncStorage.getItem('bearer-token');
+
+      console.log(userId, userKey, userBearerToken);
+
+      await user_profile(userId, userKey, userBearerToken).then(res => {
+        if (res.status === 200) {
+          setUser(res.data.data);
+          // setLoading(false);
+
+          setLoading(false);
+        }
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getMeterDetail = async () => {
+    try {
+      const brand_name = brand.toLowerCase();
+
+      const userKey = await AsyncStorage.getItem('user-key');
+      const userBearerToken = await AsyncStorage.getItem('bearer-token');
+
+      const product_sku_code = 'pln_check_user';
+
+      console.log(number, brand_name, type, user_balance);
+
+      await account_ref(
+        userKey,
+        userBearerToken,
         number,
+        product_sku_code,
+        brand_name,
+      ).then(res => {
+        if (res.status === 200) {
+          // let string = 'NURDIN[id]323201372948[power]R1 /000001300';
+          let string = res.data.data.name;
+
+          // Split the string based on the delimiters
+          let parts = string.split(/\[|\]/);
+
+          // Extract the values and assign them to variables
+          let name = parts[0];
+          let id = parts[2];
+          let power = parts[4];
+
+          console.log('name =', name);
+          console.log('id =', id);
+          console.log('power =', power);
+
+          setMeterName(name);
+          setMeterId(id);
+          setMeterPower(power);
+
+          console.log(res.data.data);
+          setMeterDetail(res.data.data);
+        }
+      });
+    } catch (error) {
+      Alert.alert('Error', error.response);
+      console.error(error);
+    }
+  };
+
+  const submit = async (number, product_sku_code, category, brand, type) => {
+    try {
+      setLoading(true);
+
+      const amount = product_price;
+
+      const userKey = await AsyncStorage.getItem('user-key');
+      const userBearerToken = await AsyncStorage.getItem('bearer-token');
+
+      console.log(
+        number,
+        product_sku_code,
         category,
         brand,
         type,
+        amount,
+        userKey,
+        userBearerToken,
+      );
+      await transaction_create(
+        number,
+        product_sku_code,
+        category,
+        brand,
+        type,
+        amount,
         userKey,
         userBearerToken,
       ).then(res => {
-        console.log(res);
-        if (res.status === 200) {
+        // console.log(res.status);
+        if (res.status === 201) {
           console.log(res.data.data);
+          console.log('Transaction ID' + res.data.data.id);
+
+          setLoading(false);
+          navigation.replace('TransactionDetail', {id: res.data.data.id});
         }
       });
     } catch (error) {
@@ -60,58 +164,184 @@ const CheckOut = ({route}) => {
     return amount;
   }
 
+  // const [tableHead, setTableHead] = useState(['Head', 'Head2']);
+  // const [tableData, setTableData] = useState([
+  //   ['1', '2'],
+  //   ['a', 'b'],
+  //   ['1', '2'],
+  //   ['a', 'b'],
+  // ]);
+
+  const PlnUserDetail = () => {
+    if (meterId == '0') {
+      return null;
+    }
+
+    return (
+      <>
+        <View style={styles.row}>
+          <View style={styles.col}>
+            <Text style={styles.text}>Nama </Text>
+          </View>
+          <View style={styles.col}>
+            <Text style={styles.textValue}>{meterName}</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.col}>
+            <Text style={styles.text}>Subscriber ID</Text>
+          </View>
+          <View style={styles.col}>
+            <Text style={styles.textValue}>{meterId}</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.col}>
+            <Text style={styles.text}>Segment Power </Text>
+          </View>
+          <View style={styles.col}>
+            <Text style={styles.textValue}>{meterPower}</Text>
+          </View>
+        </View>
+      </>
+    );
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView>
-        <Card style={styles.card}>
-          <Text style={styles.title}></Text>
-          <View>
-            <Text>Number : {number}</Text>
-            <Text>Category : {category}</Text>
-            <Text>Brand : {brand}</Text>
-            <Text>Buyer SKU Code : {product_sku_code}</Text>
-            <Text>Type : {type}</Text>
-            <Text>Product Price : {product_price}</Text>
-            <Text>User Balance : {user_balance}</Text>
-          </View>
-        </Card>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => {
-            submit(
-              product_sku_code,
-              number,
-              category.toLowerCase(),
-              brand.toLowerCase(),
-              type.toLowerCase(),
-            );
-          }}>
-          <View style={styles.row}>
-            <View style={styles.col}>
-              <Text style={styles.totalText}>
-                Rp {formatCurrency(product_price)},00
-              </Text>
+    <>
+      <SafeAreaView style={styles.container}>
+        <ScrollView>
+          <Card style={styles.card}>
+            {/* <Text style={styles.title}></Text> */}
+            {/* <Table
+              style={styles.table}
+              borderStyle={{
+                borderWidth: 2,
+                borderColor: theme['color-primary-200'],
+              }}>
+              <Row
+                data={tableHead}
+                style={styles.head}
+                textStyle={styles.text}
+              />
+              <Rows data={tableData} textStyle={styles.text} />
+            </Table> */}
+            <View style={styles.row}>
+              <View style={styles.col}>
+                <Text style={styles.text}>Number </Text>
+              </View>
+              <View style={styles.col}>
+                <Text style={styles.textValue}>{number}</Text>
+              </View>
             </View>
-            <View style={styles.col}>
-              <Text style={styles.buttonText}>
-                Check Out{' '}
-                <MaterialCommunityIcons name="arrow-right" size={18} />
-              </Text>
+            <PlnUserDetail />
+            <View style={styles.row}>
+              <View style={styles.col}>
+                <Text style={styles.text}>Category </Text>
+              </View>
+              <View style={styles.col}>
+                <Text style={styles.textValue}>{category}</Text>
+              </View>
             </View>
-          </View>
-        </TouchableOpacity>
-      </ScrollView>
-    </SafeAreaView>
+            <View style={styles.row}>
+              <View style={styles.col}>
+                <Text style={styles.text}>Brand </Text>
+              </View>
+              <View style={styles.col}>
+                <Text style={styles.textValue}>{brand}</Text>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={styles.col}>
+                <Text style={styles.text}>Type</Text>
+              </View>
+              <View style={styles.col}>
+                <Text style={styles.textValue}>{type}</Text>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={styles.col}>
+                <Text style={styles.text}>Product Price</Text>
+              </View>
+              <View style={styles.col}>
+                <Text style={styles.textValue}>
+                  {formatCurrency(product_price)}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.line} />
+            <View style={styles.row}>
+              <View style={styles.col}>
+                <Text style={styles.text}>Discount</Text>
+              </View>
+              <View style={styles.col}>
+                <Text style={styles.textValue}>-</Text>
+              </View>
+            </View>
+          </Card>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              submit(
+                number,
+                product_sku_code,
+                category.toLowerCase(),
+                brand.toLowerCase(),
+                type.toLowerCase(),
+              );
+            }}>
+            <View style={styles.row}>
+              <View style={styles.col}>
+                <Text style={styles.totalText}>
+                  Total : {formatCurrency(product_price)},00
+                </Text>
+              </View>
+              <View style={styles.col}>
+                <Text style={styles.buttonText}>
+                  Check Out{' '}
+                  <MaterialCommunityIcons name="arrow-right" size={18} />
+                </Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </ScrollView>
+      </SafeAreaView>
+      <Bounce
+        size={48}
+        color={theme['color-secondary-500']}
+        style={[styles.spinkitLoader, {display: isLoading ? 'flex' : 'none'}]}
+      />
+    </>
   );
 };
 
 const styles = StyleSheet.create({
+  spinkitLoader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme['color-dark-500'],
+    opacity: 0.7,
+    position: 'absolute',
+    zIndex: 1000,
+    width: '100%',
+    height: '100%',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
+  },
   container: {
     flex: 1,
     // justifyContent: 'center',
     // alignItems: 'center',
     paddingHorizontal: 25,
     backgroundColor: theme['color-dark-gray-200'],
+  },
+  line: {
+    borderBottomColor: theme['color-dark-gray-300'],
+    borderBottomWidth: 1,
+    marginVertical: 10, // Adjust this value to change the vertical space around the line
   },
   row: {
     flexDirection: 'row',
@@ -127,6 +357,18 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 15,
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
+    paddingHorizontal: 10,
+    paddingVertical: 12,
+  },
+
+  text: {
+    color: theme['color-dark-gray-500'],
+    // fontSize: 15,
+  },
+  textValue: {
+    textAlign: 'right',
+    color: theme['color-dark-500'],
+    fontSize: 15,
   },
   input: {
     height: 40,
@@ -142,8 +384,8 @@ const styles = StyleSheet.create({
   button: {
     height: 48,
     backgroundColor: theme['color-secondary-500'],
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 25,
     borderTopLeftRadius: 0,
     borderTopRightRadius: 0,
     borderBottomLeftRadius: 15,
