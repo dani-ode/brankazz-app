@@ -35,6 +35,7 @@ import InputEwalletNominal from '../pages/services/emoney/InputEwalletNominal';
 import InputMeterNumber from '../pages/services/pln/InputMeterNumber';
 import BankList from '../pages/services/bank/BankList';
 import DepositDetail from '../pages/Mutasi/Deposit/DepositDetail';
+import InputDepositNominal from '../pages/Exchange/InputDepositNominal';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -229,18 +230,31 @@ export class Routes extends Component {
             name="ExchangeSelectSeller"
             component={SelectSeller}
             options={{title: 'Exchange'}}
-            initialParams={{
-              account_number: '',
-              ask_quantity: '',
-              ask_price: '',
-              user_name: '',
-            }}
           />
 
           <Stack.Screen
             name="ExchangeBidQueue"
             component={BidQueue}
             options={{title: 'Antrian Penawaran'}}
+            initialParams={{
+              account_number: '',
+              ask_quantity: '',
+              ask_price: '',
+            }}
+          />
+          <Stack.Screen
+            name="ExchangeInputDepositNominal"
+            component={InputDepositNominal}
+            options={{title: 'Antrian Penawaran'}}
+            initialParams={{
+              partner_kampua_number: '',
+              ask_quantity: '',
+              ask_price: '',
+              payment_method: '',
+              provider_name: '',
+              partner_billing_name: '',
+              partner_billing_number: '',
+            }}
           />
 
           {/* services ---------------- */}
@@ -361,17 +375,6 @@ export class Routes extends Component {
             initialParams={{
               user_balance: '',
               category: '',
-            }}
-          />
-          <Stack.Screen
-            name="ServiceBankInputAccountNumber"
-            component={InputEwalletNumber}
-            options={{title: 'Masukkan Nomor'}}
-            initialParams={{
-              user_balance: '',
-              category: '',
-              brand: '',
-              code: '',
             }}
           />
 

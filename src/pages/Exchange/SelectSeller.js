@@ -31,12 +31,10 @@ const SelectSeller = ({navigation}) => {
     const account_number = item.user_account;
     const ask_quantity = item.quantity;
     const ask_price = item.price;
-    const user_name = item.user_name;
     navigation.navigate('ExchangeBidQueue', {
       account_number,
       ask_quantity,
       ask_price,
-      user_name,
     });
   };
 

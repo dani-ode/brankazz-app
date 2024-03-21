@@ -2,39 +2,42 @@ import {View, Text, StyleSheet, TextInput, Alert} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {account_ref, transaction_create} from '../../../api/transaction_api';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Card} from '@ui-kitten/components';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {default as theme} from '../../../../theme.json';
+import {default as theme} from '../../../theme.json';
 
 // import {Table, Row, Rows} from 'react-native-table-component';
-import {user_profile} from '../../../api/user_api';
+import {user_profile} from '../../api/user_api';
 
 import {Bounce, Wave} from 'react-native-animated-spinkit';
+import {user_by_number} from '../../api/blockhain_api';
+import {deposit_create} from '../../api/deposit_api';
 
-const InputEwalletNominal = ({route, navigation}) => {
-  const {user_balance, category, brand, number, name, code} = route.params;
+const InputDepositNominal = ({route, navigation}) => {
+  const {
+    partner_kampua_number,
+    ask_quantity,
+    ask_price,
+    payment_method,
+    provider_name,
+    partner_billing_name,
+    partner_billing_number,
+  } = route.params;
 
   const [user, setUser] = useState({});
-  const [userWallet, setUserWallet] = useState({});
+  const [partner, setPartner] = useState({});
 
   const [nominal, setNominal] = useState('');
   const [description, setDescription] = useState('');
 
   const [isLoading, setLoading] = useState(true);
 
-  const [refreshTime, setRefreshTime] = useState(2500);
-
   useEffect(() => {
     getUser();
-    getUserWallet();
-    const interval = setInterval(() => {
-      getUserWallet();
-    }, refreshTime);
-    return () => clearInterval(interval);
+    // getPartner();
   }, []);
 
   const getUser = async () => {
@@ -57,99 +60,78 @@ const InputEwalletNominal = ({route, navigation}) => {
       console.error(error);
     }
   };
+  //   const getPartner = async () => {
+  // try {
+  //   const accountNumber = partner_kampua_number;
+  //   const userKey = await AsyncStorage.getItem('user-key');
+  //   const userBearerToken = await AsyncStorage.getItem('bearer-token');
+  //   console.log(accountNumber, userKey, userBearerToken);
+  //   await user_by_number(accountNumber, userKey, userBearerToken).then(
+  //     res => {
+  //       if (res.status === 200) {
+  //         setPartner(res.data.data);
+  //         // setLoading(false);
+  //         setLoading(false);
+  //       }
+  //     },
+  //   );
+  // } catch (error) {
+  //   console.error(error);
+  // }
+  //   };
 
-  const getUserWallet = async () => {
+  const getBilling = async () => {
     try {
-      const userKey = await AsyncStorage.getItem('user-key');
-      const userBearerToken = await AsyncStorage.getItem('bearer-token');
-
-      const product_sku_code = code + 'check_user';
-
-      await account_ref(
-        userKey,
-        userBearerToken,
-        number,
-        product_sku_code,
-        brand,
-      ).then(res => {
-        if (res.status === 200) {
-          //   console.log(res.data.data.name);
-          setUserWallet(res.data.data);
-          if (res.data.data.name != null) {
-            setRefreshTime(25000);
-          }
-        }
-      });
+      //
     } catch (error) {
       Alert.alert('Error', error.response);
       console.error(error);
     }
   };
 
-  const submit = async (number, nominal) => {
+  const submit = async nominal => {
     try {
       setLoading(true);
 
-      const product_sku_code = code + nominal;
-      let type = 'pascabayar';
+      const method = payment_method;
+      const provider = provider_name;
+      const amount = nominal;
+      const partner = partner_kampua_number;
+      const third_party = 'moota';
 
       const userKey = await AsyncStorage.getItem('user-key');
       const userBearerToken = await AsyncStorage.getItem('bearer-token');
 
       console.log(
-        number,
-        product_sku_code,
-        category,
-        brand,
-        type,
-        nominal,
+        method,
+        provider,
+        amount,
+        partner,
+        third_party,
         userKey,
         userBearerToken,
       );
-      await transaction_create(
-        number,
-        product_sku_code,
-        category,
-        brand,
-        type,
-        nominal,
+      await deposit_create(
+        method,
+        provider,
+        amount,
+        partner,
+        third_party,
         userKey,
         userBearerToken,
       ).then(res => {
         // console.log(res.status);
         if (res.status === 201) {
           console.log(res.data.data);
-          console.log('Transaction ID' + res.data.data.id);
+          console.log('Deposit ID' + res.data.data.id);
 
           setLoading(false);
-          navigation.replace('TransactionDetail', {id: res.data.data.id});
+          navigation.replace('DepositDetail', {id: res.data.data.id});
         }
       });
     } catch (error) {
       console.error(error);
     }
-  };
-
-  const handleProduct = async (by_type, number) => {
-    const brand_name = brand.toUpperCase();
-
-    let type = 'prabayar';
-
-    let product_category = category;
-    if (category == 'e_wallet') {
-      product_category = 'E-Money';
-    }
-
-    console.log(number, category, brand_name, by_type, type, user_balance);
-
-    navigation.navigate('PriceList', {
-      number: number,
-      category: product_category,
-      brand: brand_name,
-      product_sku_code_type: by_type,
-      type: type,
-      user_balance: user_balance,
-    });
   };
 
   function formatCurrency(amount) {
@@ -187,7 +169,7 @@ const InputEwalletNominal = ({route, navigation}) => {
                 <Text style={styles.text}>Number </Text>
               </View>
               <View style={styles.col}>
-                <Text style={styles.textValue}>{number}</Text>
+                <Text style={styles.textValue}>{partner_billing_number}</Text>
               </View>
             </View>
             <View style={styles.row}>
@@ -195,21 +177,15 @@ const InputEwalletNominal = ({route, navigation}) => {
                 <Text style={styles.text}>Nama </Text>
               </View>
               <View style={styles.col}>
-                <Text style={styles.textValue}>
-                  {userWallet.name != '' ? (
-                    userWallet.name
-                  ) : (
-                    <Wave size={16} color={theme['color-primary-600']} />
-                  )}
-                </Text>
+                <Text style={styles.textValue}>{partner_billing_name}</Text>
               </View>
             </View>
             <View style={styles.row}>
               <View style={styles.col}>
-                <Text style={styles.text}>Category </Text>
+                <Text style={styles.text}>Tipe </Text>
               </View>
               <View style={styles.col}>
-                <Text style={styles.textValue}>{category}</Text>
+                <Text style={styles.textValue}>{payment_method}</Text>
               </View>
             </View>
             <View style={styles.row}>
@@ -217,23 +193,16 @@ const InputEwalletNominal = ({route, navigation}) => {
                 <Text style={styles.text}>Brand </Text>
               </View>
               <View style={styles.col}>
-                <Text style={styles.textValue}>{brand.toUpperCase()}</Text>
+                <Text style={styles.textValue}>
+                  {provider_name.toUpperCase()}
+                </Text>
               </View>
             </View>
-
-            {/* <View style={styles.row}>
-              <View style={styles.col}>
-                <Text style={styles.text}>Discount</Text>
-              </View>
-              <View style={styles.col}>
-                <Text style={styles.textValue}>-</Text>
-              </View>
-            </View> */}
           </Card>
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
-              submit(number, nominal);
+              submit(nominal);
             }}>
             <View style={styles.row}>
               <View style={styles.col}>
@@ -243,43 +212,12 @@ const InputEwalletNominal = ({route, navigation}) => {
               </View>
               <View style={styles.col}>
                 <Text style={styles.buttonText}>
-                  Check Out{' '}
+                  Buat Invoice{' '}
                   <MaterialCommunityIcons name="arrow-right" size={18} />
                 </Text>
               </View>
             </View>
           </TouchableOpacity>
-          <Text style={styles.sepparator}> ---- Atau Pilih Nominal ----</Text>
-          <View style={styles.sugesstion}>
-            <TouchableOpacity
-              style={[
-                styles.buttonSugestion,
-                {
-                  backgroundColor: theme['color-primary-600'],
-                },
-              ]}
-              onPress={() => {
-                handleProduct(code + 'r', number);
-              }}>
-              <Text style={styles.description}>
-                Top Up {brand.toUpperCase()} Promo
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.buttonSugestion,
-                {
-                  backgroundColor: theme['color-primary-500'],
-                },
-              ]}
-              onPress={() => {
-                handleProduct(code + 'adm', number);
-              }}>
-              <Text style={styles.description}>
-                Top Up {brand.toUpperCase()} Admin 2.000
-              </Text>
-            </TouchableOpacity>
-          </View>
         </ScrollView>
       </SafeAreaView>
       <Bounce
@@ -420,4 +358,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-export default InputEwalletNominal;
+export default InputDepositNominal;

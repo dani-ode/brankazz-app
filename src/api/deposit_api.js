@@ -2,46 +2,40 @@ import ApiManager from './ApiManager';
 
 import {BRANKAZZ_ACCESS_KEY} from '@env';
 
-// const transaction_create = async (
-//   dest_number,
-//   product_sku_code,
-//   category,
-//   product_type,
-//   for_type,
-//   amount,
-//   userKey,
-//   userBearerToken,
-// ) => {
-//   try {
-//     const config = {
-//       headers: {
-//         'Access-Key': BRANKAZZ_ACCESS_KEY,
-//         'User-Key': userKey,
-//         Authorization: `Bearer ${userBearerToken}`,
-//       },
-//     };
+const deposit_create = async (
+  method,
+  provider,
+  amount,
+  partner,
+  third_party,
+  userKey,
+  userBearerToken,
+) => {
+  try {
+    const config = {
+      headers: {
+        'Access-Key': BRANKAZZ_ACCESS_KEY,
+        'User-Key': userKey,
+        Authorization: `Bearer ${userBearerToken}`,
+      },
+    };
 
-//     const bodyParameters = {
-//       dest_number: dest_number,
-//       product_sku_code: product_sku_code,
-//       product_category: category,
-//       product_brand: product_type,
-//       product_type: for_type,
-//       amount: amount,
-//     };
+    const bodyParameters = {
+      method: method,
+      provider: provider,
+      amount: amount,
+      partner: partner,
+      third_party: third_party,
+    };
 
-//     console.log(bodyParameters);
+    console.log(bodyParameters);
 
-//     const res = await ApiManager.post(
-//       '/api/transaction',
-//       bodyParameters,
-//       config,
-//     );
-//     return res;
-//   } catch (error) {
-//     console.error(error);
-//   }
-// };
+    const res = await ApiManager.post('/api/deposit', bodyParameters, config);
+    return res;
+  } catch (error) {
+    console.error(error);
+  }
+};
 const deposit_show = async (id, userKey, userBearerToken) => {
   try {
     const res = await ApiManager.get('/api/deposit/' + id, {
@@ -58,4 +52,4 @@ const deposit_show = async (id, userKey, userBearerToken) => {
   }
 };
 
-export {deposit_show};
+export {deposit_create, deposit_show};
