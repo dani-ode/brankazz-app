@@ -66,12 +66,12 @@ const FintechList = ({route, navigation}) => {
         logo: Images.FintechLogo.ovoLogo,
       },
       {
-        brand: 'ShopeePay',
+        brand: 'Shopee Pay',
         code: 'shppay_',
         logo: Images.FintechLogo.shppayLogo,
       },
       {
-        brand: 'ShopeePay Mitra',
+        brand: 'Mitra Shopee',
         code: 'shppaym_',
         logo: Images.FintechLogo.shppaymLogo,
       },

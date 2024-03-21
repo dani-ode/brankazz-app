@@ -5,7 +5,7 @@ const ForgotPassword = () => {
   return (
     <View>
       <Text style={{color: '#888', margin: 20}}>
-        Tenang.. coba di ingat-ingat lagi ...
+        Tenang... dan coba di ingat-ingat lagi.
       </Text>
     </View>
   );

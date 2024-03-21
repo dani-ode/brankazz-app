@@ -33,6 +33,8 @@ import FintechList from '../pages/services/emoney/FintechList';
 import InputEwalletNumber from '../pages/services/emoney/InputEwalletNumber';
 import InputEwalletNominal from '../pages/services/emoney/InputEwalletNominal';
 import InputMeterNumber from '../pages/services/pln/InputMeterNumber';
+import BankList from '../pages/services/bank/BankList';
+import DepositDetail from '../pages/Mutasi/Deposit/DepositDetail';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -340,7 +342,7 @@ export class Routes extends Component {
           <Stack.Screen
             name="ServiceEwalletInputNominal"
             component={InputEwalletNominal}
-            options={{title: 'Masukkan Nomor'}}
+            options={{title: 'Masukkan Nominal'}}
             initialParams={{
               user_balance: '',
               category: '',
@@ -348,6 +350,27 @@ export class Routes extends Component {
               code: '',
               number: '',
               name: '',
+              code: '',
+            }}
+          />
+          {/* Bank */}
+          <Stack.Screen
+            name="ServiceBankList"
+            component={BankList}
+            options={{title: 'Pilih Bank'}}
+            initialParams={{
+              user_balance: '',
+              category: '',
+            }}
+          />
+          <Stack.Screen
+            name="ServiceBankInputAccountNumber"
+            component={InputEwalletNumber}
+            options={{title: 'Masukkan Nomor'}}
+            initialParams={{
+              user_balance: '',
+              category: '',
+              brand: '',
               code: '',
             }}
           />
@@ -363,14 +386,14 @@ export class Routes extends Component {
               id: '',
             }}
           />
-          {/* <Stack.Screen
+          <Stack.Screen
             name="DepositDetail"
             component={DepositDetail}
             options={{title: 'Deposit Detail'}}
             initialParams={{
               id: '',
             }}
-          /> */}
+          />
         </Stack.Navigator>
       </>
     );

@@ -19,9 +19,17 @@ import {default as theme} from '../../../../theme.json';
 import {transaction_lists} from '../../../api/mutasi_api';
 
 const Transaction = ({navigation}) => {
+  let date = new Date().getDate();
+  let currentDate = new Date().getDate() + 2;
+  let month = new Date().getMonth();
+  let currentMonth = new Date().getMonth() + 1;
+  let year = new Date().getFullYear();
+
   const [mutasi, setMutasi] = useState([]);
-  const [firstDate, setfirstDate] = useState('2024-01-01');
-  const [endDate, setEndDate] = useState(new Date());
+  const [firstDate, setfirstDate] = useState(year + '-' + month + '-' + date);
+  const [endDate, setEndDate] = useState(
+    year + '-' + currentMonth + '-' + currentDate,
+  );
 
   useEffect(() => {
     getMutasi();
@@ -32,14 +40,6 @@ const Transaction = ({navigation}) => {
       const userKey = await AsyncStorage.getItem('user-key');
 
       const userBearerToken = await AsyncStorage.getItem('bearer-token');
-
-      let date = new Date().getDate();
-      let month = new Date().getMonth() + 1;
-      let current_month = new Date().getMonth() + 2;
-      let year = new Date().getFullYear();
-
-      setfirstDate(year + '-' + month + '-' + date);
-      setEndDate(year + '-' + current_month + '-' + date);
 
       console.log(firstDate, endDate, userKey, userBearerToken);
 

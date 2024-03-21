@@ -26,6 +26,18 @@ const Images = {
     sakukuLogo: require('./fintech-logo/sakuku.png'),
     dokuLogo: require('./fintech-logo/doku.png'),
   },
+  BankLogo: {
+    bcaLogo: require('./bank-logo/bca.png'),
+    bniLogo: require('./bank-logo/bni.png'),
+    briLogo: require('./bank-logo/bri.png'),
+    btpnLogo: require('./bank-logo/btpn.png'),
+    mandiriLogo: require('./bank-logo/mandiri.png'),
+    permataLogo: require('./bank-logo/permata.png'),
+  },
+  GameLogo: {
+    mobileLegendsLogo: require('./game-logo/mobile-legends.png'),
+    freeFireLogo: require('./game-logo/free-fire.png'),
+  },
 };
 
 export default Images;

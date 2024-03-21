@@ -25,50 +25,69 @@ import Images from '../../../assets/images';
 
 const InputNumber = ({route}) => {
   const {user_balance, category} = route.params;
+
   const navigation = useNavigation();
   const [number, setNumber] = useState(0);
 
+  useEffect(() => {
+    //
+  }, []);
+
   const type = 'prabayar';
   let brandCard = '';
+  let brandName = 'XL';
 
   // Provider Logo
   let OperatorLogo = Images.OperatorLogo.OperatorLogo;
 
-  if (number.length > 6) {
-    const brand = getOperator(number);
-    if (brand.message == 'VALID') {
-      // console.log(brand);
-      // return;
-      brandCard = brand.card;
+  if (category == 'Games') {
+    OperatorLogo = Images.GameLogo.mobileLegendsLogo;
+    brandName = 'MOBILE LEGENDS';
+  } else {
+    if (number.length > 6) {
+      const brand = getOperator(number);
+      if (brand.message == 'VALID') {
+        // console.log(brand);
+        // return;
+        brandCard = brand.card;
 
-      if (brand.operator === 'Telkomsel') {
-        OperatorLogo = Images.OperatorLogo.TelkomselLogo;
-      } else if (brand.operator === 'Indosat Ooredoo') {
-        OperatorLogo = Images.OperatorLogo.IndosatOoredooLogo;
-      } else if (brand.operator === 'XL Axiata') {
-        OperatorLogo = Images.OperatorLogo.XLAxiataLogo;
-      } else if (brand.operator === 'Smartfren') {
-        OperatorLogo = Images.OperatorLogo.SmartfrenLogo;
-      } else if (brand.operator === 'Net1') {
-        OperatorLogo = Images.OperatorLogo.Net1Logo;
-      } else if (brand.operator === 'ByRU') {
-        OperatorLogo = Images.OperatorLogo.ByRULogo;
-      } else if (brand.operator === '3') {
-        OperatorLogo = Images.OperatorLogo.TriLogo;
+        if (brand.operator === 'Telkomsel') {
+          brandName = 'TELKOMSEL';
+          OperatorLogo = Images.OperatorLogo.TelkomselLogo;
+        } else if (brand.operator === 'Indosat Ooredoo') {
+          brandName = 'INDOSAT';
+          OperatorLogo = Images.OperatorLogo.IndosatOoredooLogo;
+        } else if (brand.operator === 'XL Axiata') {
+          brandName = 'XL';
+          OperatorLogo = Images.OperatorLogo.XLAxiataLogo;
+        } else if (brand.operator === 'Smartfren') {
+          brandName = 'SMARTFREN';
+          OperatorLogo = Images.OperatorLogo.SmartfrenLogo;
+        } else if (brand.operator === 'Net1') {
+          brandName = 'NET1';
+          OperatorLogo = Images.OperatorLogo.Net1Logo;
+        } else if (brand.operator === 'ByRU') {
+          brandName = 'by.U';
+          OperatorLogo = Images.OperatorLogo.ByRULogo;
+        } else if (brand.operator === '3') {
+          brandName = 'TRI';
+          OperatorLogo = Images.OperatorLogo.TriLogo;
+        }
+
+        // brandOperator = brand.operator;
+
+        // console.log(brandOperator);
       }
-
-      // setOperator(brand.operator);
-      // set show button
     }
   }
 
   const handleProduct = async (by_type, number) => {
+    // console.log(by_type, number, brandName);
     if (number.length < 7) {
       alert('Masukkan nomor yang valid');
       return;
     }
     const brand = getOperator(number);
-
     if (!brand) {
       alert('Masukkan nomor yang valid');
       return;
@@ -77,9 +96,7 @@ const InputNumber = ({route}) => {
       alert('Masukkan nomor yang valid');
       return;
     }
-
-    const brand_name = brand.operator.toUpperCase();
-
+    const brand_name = brandName;
     navigation.navigate('PriceList', {
       number: number,
       category: category,
@@ -89,6 +106,168 @@ const InputNumber = ({route}) => {
       user_balance: user_balance,
     });
   };
+
+  const sugesstionData = [
+    {
+      Pulsa: {
+        TELKOMSEL: [
+          {name: 'Promo', code: 'tsel_p', description: 'Harga Termurah'},
+          {name: 'Reguler', code: 'tsel_r', description: 'Transaksi Cepat'},
+          {name: 'Transfer', code: 'tselt_r', description: 'Pulsa Transfer'},
+        ],
+        INDOSAT: [
+          {name: 'Promo', code: 'indosat_p', description: 'Harga Termurah'},
+          {name: 'Reguler', code: 'indosat_r', description: 'Transaksi Cepat'},
+        ],
+        SMARTFREN: [
+          {
+            name: 'Promo',
+            code: 'smart_p',
+            description: 'Harga Termurah',
+          },
+          {
+            name: 'Reguler',
+            code: 'smart_r',
+            description: 'Transaksi Cepat',
+          },
+        ],
+        TRI: [
+          {name: 'Promo', code: 'three_p', description: 'Harga Termurah'},
+          {name: 'Reguler', code: 'three_r', description: 'Transaksi Cepat'},
+        ],
+        XL: [
+          {name: 'Promo', code: 'xl_p', description: 'Harga Termurah'},
+          {name: 'Reguler', code: 'xl_r', description: 'Transaksi Cepat'},
+        ],
+        'by.U': [
+          {name: 'Promo', code: 'byru_p', description: 'Harga Termurah'},
+          {name: 'Reguler', code: 'byru_r', description: 'Transaksi Cepat'},
+        ],
+      },
+    },
+    {
+      Data: {
+        TELKOMSEL: [
+          {name: 'Flash', code: 'tseldflash_r', description: 'Transaksi Cepat'},
+          {name: 'Combo', code: 'tseldcombo_r', description: 'Combo Sakti'},
+          {
+            name: 'Midnight',
+            code: 'tseldmalam_r',
+            description: 'Internet Malam',
+          },
+          {name: 'Check', code: 'tseld_check_user', description: 'Cek Paket'},
+        ],
+        INDOSAT: [
+          {name: 'Promo', code: 'indosat_p', description: 'Harga Termurah'},
+          {name: 'Reguler', code: 'indosat_r', description: 'Transaksi Cepat'},
+        ],
+        SMARTFREN: [
+          {
+            name: 'Promo',
+            code: 'smart_p',
+            description: 'Harga Termurah',
+          },
+          {
+            name: 'Reguler',
+            code: 'smart_r',
+            description: 'Transaksi Cepat',
+          },
+        ],
+        TRI: [
+          {name: 'Promo', code: 'three_p', description: 'Harga Termurah'},
+          {name: 'Reguler', code: 'three_r', description: 'Transaksi Cepat'},
+        ],
+        XL: [
+          {name: 'Promo', code: 'xl_p', description: 'Harga Termurah'},
+          {name: 'Reguler', code: 'xl_r', description: 'Transaksi Cepat'},
+        ],
+        'by.U': [
+          {name: 'Promo', code: 'byru_p', description: 'Harga Termurah'},
+          {name: 'Reguler', code: 'byru_r', description: 'Transaksi Cepat'},
+        ],
+      },
+    },
+    {
+      'Paket SMS & Telpon': {
+        TELKOMSEL: [
+          {
+            name: 'Telephone',
+            code: 'tselsns_r',
+            description: 'Transaksi Cepat',
+          },
+          {name: 'SMS', code: 'tselns_r', description: 'Combo Sakti'},
+        ],
+        INDOSAT: [
+          {name: 'Promo', code: 'indosat_p', description: 'Harga Termurah'},
+          {name: 'Reguler', code: 'indosat_r', description: 'Transaksi Cepat'},
+        ],
+        SMARTFREN: [
+          {
+            name: 'Promo',
+            code: 'smart_p',
+            description: 'Harga Termurah',
+          },
+          {
+            name: 'Reguler',
+            code: 'smart_r',
+            description: 'Transaksi Cepat',
+          },
+        ],
+        TRI: [
+          {name: 'Promo', code: 'three_p', description: 'Harga Termurah'},
+          {name: 'Reguler', code: 'three_r', description: 'Transaksi Cepat'},
+        ],
+        XL: [
+          {name: 'Promo', code: 'xl_p', description: 'Harga Termurah'},
+          {name: 'Reguler', code: 'xl_r', description: 'Transaksi Cepat'},
+        ],
+        'by.U': [
+          {name: 'Promo', code: 'byru_p', description: 'Harga Termurah'},
+          {name: 'Reguler', code: 'byru_r', description: 'Transaksi Cepat'},
+        ],
+      },
+    },
+    {
+      Games: {
+        'MOBILE LEGENDS': [
+          {
+            name: 'Mobile Legends',
+            code: 'mlegend_r',
+            description: 'Harga Termurah',
+          },
+        ],
+        'FREE FIRE': [
+          {
+            name: 'Free Fire',
+            code: 'ffire_r',
+            description: 'Harga Termurah',
+          },
+        ],
+      },
+    },
+  ];
+
+  function getCode(category, brand) {
+    console.log(category, brand);
+
+    for (const item of sugesstionData) {
+      if (item.hasOwnProperty(category)) {
+        const categoryData = item[category];
+        if (categoryData.hasOwnProperty(brand)) {
+          const brandData = categoryData[brand];
+          const codes = brandData.map(item => ({
+            code: item.code,
+            name: item.name,
+            description: item.description,
+          }));
+          return codes.length > 0 ? codes : null; // Return null if no codes found
+        } else {
+          return [{code: 'null', name: 'null'}]; // Return null if brand not found
+        }
+      }
+    }
+    return null; // Return null jika tidak ditemukan
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -105,110 +284,48 @@ const InputNumber = ({route}) => {
               maxLength={20}
             />
             <View style={styles.sugesstion}>
-              <TouchableOpacity
-                style={[
-                  styles.button,
-                  {
-                    backgroundColor: theme['color-gray-600'],
-                  },
-                ]}
-                onPress={() => {
-                  handleProduct('tsel_p', number);
-                }}>
-                <View style={styles.row}>
-                  <View style={styles.providerLogoContainer}>
-                    <Image style={styles.providerLogo} source={OperatorLogo} />
-                  </View>
-                  <View style={[styles.column, {flexDirection: 'column'}]}>
+              {getCode(category, brandName).map((item, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.button,
+                    {
+                      backgroundColor: theme['color-gray-600'],
+                    },
+                  ]}
+                  onPress={() => {
+                    handleProduct(item.code, number);
+                  }}>
+                  <View style={styles.row}>
+                    <View style={styles.providerLogoContainer}>
+                      <Image
+                        style={styles.providerLogo}
+                        source={OperatorLogo}
+                      />
+                    </View>
+                    <View style={[styles.column, {flexDirection: 'column'}]}>
+                      <Text
+                        style={[
+                          styles.buttonText,
+                          {color: theme['color-primary-100']},
+                        ]}>
+                        {category}
+                        {brandCard ? ' ' + brandCard : ''} {item.name}
+                      </Text>
+                      <Text style={styles.description}>{item.description}</Text>
+                    </View>
                     <Text
                       style={[
-                        styles.buttonText,
-                        {color: theme['color-primary-100']},
+                        {
+                          color: theme['color-primary-100'],
+                          marginLeft: 'auto',
+                        },
                       ]}>
-                      {category}
-                      {brandCard ? ' ' + brandCard : ''} Promo
+                      <MaterialCommunityIcons name="arrow-right" size={20} />
                     </Text>
-                    <Text style={styles.description}>Harga Temurah</Text>
                   </View>
-                  <Text
-                    style={[
-                      {
-                        color: theme['color-primary-100'],
-                        marginLeft: 'auto',
-                      },
-                    ]}>
-                    <MaterialCommunityIcons name="arrow-right" size={20} />
-                  </Text>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.button,
-                  {
-                    backgroundColor: theme['color-dark-gray-600'],
-                  },
-                ]}
-                onPress={() => {
-                  handleProduct('tsel_r', number);
-                }}>
-                <View style={styles.row}>
-                  <View style={styles.providerLogoContainer}>
-                    <Image style={styles.providerLogo} source={OperatorLogo} />
-                  </View>
-                  <View style={[styles.column, {flexDirection: 'column'}]}>
-                    <Text
-                      style={[
-                        styles.buttonText,
-                        {color: theme['color-primary-100']},
-                      ]}>
-                      {category}
-                      {brandCard ? ' ' + brandCard : ''} Reguler
-                    </Text>
-                    <Text style={styles.description}>Transaksi Cepat</Text>
-                  </View>
-                  <Text
-                    style={[
-                      {
-                        color: theme['color-primary-100'],
-                        marginLeft: 'auto',
-                      },
-                    ]}>
-                    <MaterialCommunityIcons name="arrow-right" size={20} />
-                  </Text>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.button,
-                  {
-                    backgroundColor: theme['color-gray-600'],
-                  },
-                ]}
-                onPress={() => {
-                  handleProduct('tselt_r', number);
-                }}>
-                <View style={styles.row}>
-                  <View style={styles.providerLogoContainer}>
-                    <Image style={styles.providerLogo} source={OperatorLogo} />
-                  </View>
-                  <View style={[styles.column, {flexDirection: 'column'}]}>
-                    <Text style={styles.buttonText}>
-                      {category}
-                      {brandCard ? ' ' + brandCard : ''} Transfer
-                    </Text>
-                    <Text style={styles.description}>Transfer</Text>
-                  </View>
-                  <Text
-                    style={[
-                      {
-                        color: theme['color-primary-100'],
-                        marginLeft: 'auto',
-                      },
-                    ]}>
-                    <MaterialCommunityIcons name="arrow-right" size={20} />
-                  </Text>
-                </View>
-              </TouchableOpacity>
+                </TouchableOpacity>
+              ))}
             </View>
           </Card>
         </View>

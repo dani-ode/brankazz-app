@@ -206,7 +206,16 @@ const HomeScreen = () => {
                   </View>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.service}>
+                <TouchableOpacity
+                  style={styles.service}
+                  onPress={() =>
+                    handleService({
+                      navigation,
+                      category: 'Data',
+                      navigation_screen: 'ServicePulsaInputNumber',
+                      user_balance,
+                    })
+                  }>
                   <View style={[styles.col]}>
                     <View style={[styles.serviceIcon, styles.serviceItem]}>
                       <MaterialCommunityIcons
@@ -253,8 +262,16 @@ const HomeScreen = () => {
                   <Text style={styles.serviceTextAll}>E-Wallet</Text>
                 </View>
               </TouchableOpacity>
-
-              <TouchableOpacity style={styles.service}>
+              <TouchableOpacity
+                style={styles.service}
+                onPress={() =>
+                  handleService({
+                    navigation,
+                    category: 'Bank',
+                    navigation_screen: 'ServiceBankList',
+                    user_balance,
+                  })
+                }>
                 <View style={[styles.col]}>
                   <View style={[styles.serviceIcon, styles.serviceItemAll]}>
                     <MaterialCommunityIcons
@@ -267,29 +284,46 @@ const HomeScreen = () => {
                 </View>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.service}>
+              <TouchableOpacity
+                style={styles.service}
+                onPress={() =>
+                  handleService({
+                    navigation,
+                    category: 'Paket SMS & Telpon',
+                    navigation_screen: 'ServicePulsaInputNumber',
+                    user_balance,
+                  })
+                }>
                 <View style={[styles.col]}>
                   <View style={[styles.serviceIcon, styles.serviceItemAll]}>
                     <MaterialCommunityIcons
-                      name="water-pump"
+                      name="cellphone"
                       size={24}
                       color={theme['color-secondary-800']}
                     />
                   </View>
-                  <Text style={styles.serviceTextAll}>PDAM</Text>
+                  <Text style={styles.serviceTextAll}>Telp/SMS</Text>
                 </View>
               </TouchableOpacity>
-
-              <TouchableOpacity style={styles.service}>
+              <TouchableOpacity
+                style={styles.service}
+                onPress={() =>
+                  handleService({
+                    navigation,
+                    category: 'Games',
+                    navigation_screen: 'ServicePulsaInputNumber',
+                    user_balance,
+                  })
+                }>
                 <View style={[styles.col]}>
                   <View style={[styles.serviceIcon, styles.serviceItemAll]}>
                     <MaterialCommunityIcons
-                      name="television-classic"
+                      name="gamepad"
                       size={24}
                       color={theme['color-secondary-800']}
                     />
                   </View>
-                  <Text style={styles.serviceTextAll}>TV kabel</Text>
+                  <Text style={styles.serviceTextAll}>Games</Text>
                 </View>
               </TouchableOpacity>
             </View>
@@ -324,12 +358,12 @@ const HomeScreen = () => {
                 <View style={[styles.col]}>
                   <View style={[styles.serviceIcon, styles.serviceItemAll]}>
                     <MaterialCommunityIcons
-                      name="gamepad"
+                      name="television-classic"
                       size={24}
                       color={theme['color-secondary-800']}
                     />
                   </View>
-                  <Text style={styles.serviceTextAll}>Game</Text>
+                  <Text style={styles.serviceTextAll}>TV Kabel</Text>
                 </View>
               </TouchableOpacity>
 
