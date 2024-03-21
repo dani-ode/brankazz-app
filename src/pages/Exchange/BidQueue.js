@@ -45,6 +45,26 @@ const BidQueue = ({route}) => {
       console.error(error);
     }
   };
+  const getPartnerBillings = async () => {
+    const userKey = await AsyncStorage.getItem('user-key');
+    const userBearerToken = await AsyncStorage.getItem('bearer-token');
+
+    try {
+      await bid_list(account_number, userKey, userBearerToken).then(res => {
+        if (res.status === 200) {
+          const bid_list = res.data.data;
+
+          setBids(
+            bid_list.map(item => [item.date, item.order_id, item.status]),
+          );
+          console.log(bid_list);
+          // setLoading(false);
+        }
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const snapPoints = useMemo(() => ['25%', '80%'], []);
   // ref
@@ -72,7 +92,7 @@ const BidQueue = ({route}) => {
         snapPoints={snapPoints}
         onChange={handleSheetChanges}>
         <BottomSheetView style={styles.contentContainer}>
-          <Text>Pilih Metode Pembayaran</Text>
+          <Text>Masukkan Nominal Deposit</Text>
         </BottomSheetView>
       </BottomSheet>
     </View>
