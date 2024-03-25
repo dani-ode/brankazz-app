@@ -280,6 +280,9 @@ export class Routes extends Component {
               type: '',
               number: '',
               partner_name: '',
+              amount_code: '',
+              set_amount: '',
+              set_description: '',
             }}
           />
 

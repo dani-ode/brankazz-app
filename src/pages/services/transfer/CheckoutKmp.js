@@ -16,12 +16,21 @@ import {user_profile} from '../../../api/user_api';
 import {Bounce} from 'react-native-animated-spinkit';
 
 const CheckoutKmp = ({route, navigation}) => {
-  const {category, brand, type, number, partner_name} = route.params;
+  const {
+    category,
+    brand,
+    type,
+    number,
+    partner_name,
+    amount_code,
+    set_amount,
+    set_description,
+  } = route.params;
 
   const [user, setUser] = useState({});
 
-  const [nominal, setNominal] = useState('');
-  const [description, setDescription] = useState('');
+  const [nominal, setNominal] = useState(set_amount);
+  const [description, setDescription] = useState(set_description);
 
   const [isLoading, setLoading] = useState(true);
 
@@ -50,32 +59,43 @@ const CheckoutKmp = ({route, navigation}) => {
     }
   };
 
-  const submit = async (number, nominal) => {
+  const submit = async (number, nominal, description) => {
     try {
       setLoading(true);
 
+      const dest_number = number;
       const product_sku_code = 'kmp_' + nominal;
+      const product_category = category;
+      const product_brand = brand;
+      const product_type = type;
+      const amount = nominal;
+      const connection = 'brankazz';
+      const new_description = description ?? 'Transfer sesama';
 
       const userKey = await AsyncStorage.getItem('user-key');
       const userBearerToken = await AsyncStorage.getItem('bearer-token');
 
       console.log(
-        number,
+        dest_number,
         product_sku_code,
-        category,
-        brand,
-        type,
-        nominal,
+        product_category,
+        product_brand,
+        product_type,
+        amount,
+        connection,
+        new_description,
         userKey,
         userBearerToken,
       );
       await transaction_create(
-        number,
+        dest_number,
         product_sku_code,
-        category,
-        brand,
-        type,
-        nominal,
+        product_category,
+        product_brand,
+        product_type,
+        amount,
+        connection,
+        new_description,
         userKey,
         userBearerToken,
       ).then(res => {
@@ -106,12 +126,23 @@ const CheckoutKmp = ({route, navigation}) => {
             <View style={styles.nominal}>
               <TextInput
                 keyboardType="numeric"
-                style={styles.input}
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor:
+                      amount_code == '02'
+                        ? theme['color-primary-400']
+                        : theme['color-primary-100'],
+                  },
+                ]}
                 placeholder="Nominal"
                 autoFocus={true}
+                value={amount_code == '02' ? set_amount : nominal}
                 placeholderTextColor={theme['color-primary-500']}
                 onChangeText={nominal => setNominal(nominal)}
                 maxLength={20}
+                editable={amount_code == '02' ? false : true}
+                selectTextOnFocus={amount_code == '02' ? false : true}
               />
               <TextInput
                 style={styles.inputDescription}
@@ -119,6 +150,9 @@ const CheckoutKmp = ({route, navigation}) => {
                 placeholderTextColor={theme['color-primary-500']}
                 onChangeText={description => setDescription(description)}
                 maxLength={20}
+                value={amount_code == '02' ? set_description : description}
+                editable={amount_code == '02' ? false : true}
+                selectTextOnFocus={amount_code == '02' ? false : true}
               />
             </View>
 
@@ -176,7 +210,7 @@ const CheckoutKmp = ({route, navigation}) => {
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
-              submit(number, nominal);
+              submit(number, nominal, description);
             }}>
             <View style={styles.row}>
               <View style={styles.col}>
@@ -263,14 +297,15 @@ const styles = StyleSheet.create({
   input: {
     height: 52,
     borderColor: theme['color-primary-400'],
-    backgroundColor: theme['color-primary-100'],
     borderWidth: 1,
     borderRadius: 4,
     paddingHorizontal: 24,
     fontSize: 25,
     zIndex: 100,
 
+    color: theme['color-primary-800'],
     borderRadius: 10,
+    fontWeight: 'bold',
   },
   inputDescription: {
     height: 52,

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "552313454945",
+    "project_id": "brankazz",
+    "storage_bucket": "brankazz.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:552313454945:android:6150ac130d517d46f94520",
+        "android_client_info": {
+          "package_name": "com.brankazzapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvCNJLfC2P0oJuackWnOqIw7BQwY3w3vw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

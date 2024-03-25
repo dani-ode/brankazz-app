@@ -32,10 +32,12 @@ const transaction_price_list = async (
 const transaction_create = async (
   dest_number,
   product_sku_code,
-  category,
+  product_category,
+  product_brand,
   product_type,
-  for_type,
   amount,
+  connection,
+  description,
   userKey,
   userBearerToken,
 ) => {
@@ -51,10 +53,12 @@ const transaction_create = async (
     const bodyParameters = {
       dest_number: dest_number,
       product_sku_code: product_sku_code,
-      product_category: category,
-      product_brand: product_type,
-      product_type: for_type,
+      product_category: product_category,
+      product_brand: product_brand,
+      product_type: product_type,
       amount: amount,
+      connection: connection,
+      description: description,
     };
 
     console.log(bodyParameters);

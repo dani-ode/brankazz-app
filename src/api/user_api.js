@@ -50,5 +50,48 @@ const user_profile = async (userId, userKey, userBearerToken) => {
     console.error(error);
   }
 };
+const user_logout = async (userKey, userBearerToken) => {
+  try {
+    const res = await ApiManager.get('/api/logout', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Key': BRANKAZZ_ACCESS_KEY,
+        'User-Key': userKey,
+        Authorization: 'Bearer ' + userBearerToken,
+      },
+    });
 
-export {user_login, user_profile};
+    return res;
+  } catch (error) {
+    console.error(error);
+  }
+};
+const user_fcm_token = async (user_id, fcm_token, userKey, userBearerToken) => {
+  try {
+    const config = {
+      headers: {
+        'Access-Key': BRANKAZZ_ACCESS_KEY,
+        'User-Key': userKey,
+        Authorization: `Bearer ${userBearerToken}`,
+      },
+    };
+
+    const bodyParameters = {
+      user_id: user_id,
+      fcm_token: fcm_token,
+    };
+
+    console.log(bodyParameters);
+
+    const res = await ApiManager.post(
+      '/api/create-personal-fcm-token',
+      bodyParameters,
+      config,
+    );
+    return res;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export {user_login, user_profile, user_logout, user_fcm_token};

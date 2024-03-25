@@ -30,7 +30,10 @@ export default function InputAccNumber({route, navigation}) {
             brand: brand,
             type: type,
             number: number,
-            partner_name: partner.name,
+            partner_name: res.data.data.name,
+            amount_code: '01',
+            set_amount: '0',
+            set_description: '-',
           });
         }
       });

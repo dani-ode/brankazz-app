@@ -14,19 +14,34 @@ import {
 } from 'react-native';
 
 import {default as theme} from '../../../theme.json';
-import {user_profile} from '../../api/user_api';
-import {RefreshControl} from 'react-native-gesture-handler';
+import {user_logout, user_profile} from '../../api/user_api';
+import {RefreshControl, TextInput} from 'react-native-gesture-handler';
+
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
+import Clipboard from '@react-native-clipboard/clipboard';
+import {Modal} from '@ui-kitten/components';
+import QRCode from 'react-native-qrcode-svg';
+import CheckBox from '@react-native-community/checkbox';
 
 const ProfileScreen = ({navigation}) => {
   useEffect(() => {
     getUser();
     const interval = setInterval(() => {
       getUser();
-    }, 2500);
+    }, 3500);
     return () => clearInterval(interval);
   }, []);
 
   const [user, setUser] = useState({});
+
+  const [qratonModal, setQratonModal] = useState(false);
+
+  const [qratonType, setQratonType] = useState(false);
+  const [qratonAmount, setQratonAmount] = useState(0);
+  const [qratonDescription, setQratonDescription] = useState('');
+
+  const [showQraton, setShowQraton] = useState(true);
 
   const [isLoading, setLoading] = useState(true);
 
@@ -46,8 +61,7 @@ const ProfileScreen = ({navigation}) => {
           setUser(res.data.data);
           setLoading(false);
         } else {
-          AsyncStorage.clear();
-          navigation.replace('Login');
+          handleLogout();
         }
       });
     } catch (error) {
@@ -57,11 +71,68 @@ const ProfileScreen = ({navigation}) => {
 
   const handleLogout = async () => {
     try {
+      setLoading(true);
+      const userKey = await AsyncStorage.getItem('user-key');
+      const userBearerToken = await AsyncStorage.getItem('bearer-token');
+
+      await user_logout(userKey, userBearerToken).then(res => {
+        console.log(res);
+      });
       await AsyncStorage.clear();
+      setLoading(false);
       navigation.replace('Login');
     } catch (error) {
       console.error('Error logging out:', error);
     }
+  };
+
+  const generateQRValue = (
+    standard,
+    type,
+    amount,
+    accountNumber,
+    accountName,
+    description,
+  ) => {
+    let typeStr = '02';
+    if (!type) {
+      typeStr = '01';
+    }
+
+    if (!amount) {
+      amount = 0;
+    }
+
+    if (!description) {
+      description = '-';
+    }
+
+    const amountStr = String(amount);
+
+    let amountLengthStr = String(amountStr.length);
+    if (amountStr.length < 10) {
+      amountLengthStr = '0' + amountLengthStr;
+    }
+
+    amountLengthStr = String(amountLengthStr);
+
+    const accountNumberStr = String(accountNumber);
+    const accountNameStr = String(accountName);
+
+    let accountNameLengthStr = String(accountNameStr.length);
+    if (accountNameStr.length < 10) {
+      accountNameLengthStr = '0' + accountNameLengthStr;
+    }
+
+    let descriptionLengthStr = String(description.length);
+    if (description.length < 10) {
+      descriptionLengthStr = '0' + descriptionLengthStr;
+    }
+
+    const qrValue = `${standard}${typeStr}${amountLengthStr}${amountStr}${accountNumberStr.length}${accountNumberStr}${accountNameLengthStr}${accountNameStr}${descriptionLengthStr}${description}`;
+
+    console.log(qrValue);
+    return qrValue;
   };
 
   const data = [
@@ -99,6 +170,11 @@ const ProfileScreen = ({navigation}) => {
 
   const [options, setOptions] = useState(data);
 
+  const copyToClipboard = text => {
+    console.log(text);
+    Clipboard.setString(text);
+  };
+
   const handleRefresh = () => {
     setLoading(true);
     getUser();
@@ -124,9 +200,30 @@ const ProfileScreen = ({navigation}) => {
           }}
         />
         <Text style={styles.username}>{user.name}</Text>
-        <Text style={styles.accountNumber}>
-          ADDRESS : {user.account_number}
-        </Text>
+
+        <View style={styles.row}>
+          <Text style={styles.accountNumber}>ADDRESS ({user.id}) : </Text>
+          <TouchableOpacity
+            onPress={() => {
+              ``;
+              copyToClipboard(user.account_number);
+            }}>
+            <Text style={styles.accountNumber}>{user.account_number}</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity onPress={() => setQratonModal(true)}>
+            <Text style={styles.btnQrGenerator}>
+              <MaterialCommunityIcons
+                name="qrcode-scan"
+                size={20}
+                color={theme['color-secondary-800']}
+              />{' '}
+              Tampilkan QRATON
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   };
@@ -193,6 +290,82 @@ const ProfileScreen = ({navigation}) => {
         <Text>Logout</Text>
       </TouchableOpacity> */}
       {/* </ScrollView> */}
+
+      <Modal
+        visible={qratonModal}
+        animationType="slide"
+        transparent={true} // Set transparent to true
+      >
+        <View style={styles.modalContainer}>
+          <View style={[styles.modalContent]}>
+            <View style={styles.checkboxContainer}>
+              <View style={styles.row}>
+                <CheckBox
+                  disabled={false}
+                  value={qratonType}
+                  onValueChange={newValue => {
+                    setQratonType(newValue), setShowQraton(!newValue);
+                  }}
+                />
+                <Text style={styles.checkboxText}>Tentukan Nominal?</Text>
+              </View>
+            </View>
+            <View style={{display: qratonType ? 'flex' : 'none'}}>
+              <TextInput
+                keyboardType="numeric"
+                style={styles.input}
+                placeholder="Nominal"
+                autoFocus={true}
+                placeholderTextColor={theme['color-primary-500']}
+                onChangeText={qratonAmount => setQratonAmount(qratonAmount)}
+                maxLength={20}
+              />
+              <TextInput
+                style={styles.inputDescription}
+                placeholder="Catatan ..."
+                placeholderTextColor={theme['color-primary-500']}
+                onChangeText={qratonDescription =>
+                  setQratonDescription(qratonDescription)
+                }
+                maxLength={20}
+              />
+            </View>
+            <View
+              style={{
+                display: showQraton || qratonAmount > 0 ? 'flex' : 'none',
+              }}>
+              <QRCode
+                value={generateQRValue(
+                  'QRATON',
+                  qratonType,
+                  qratonAmount,
+                  user.account_number,
+                  user.name,
+                  qratonDescription,
+                )}
+                size={200}
+                color={theme['color-dark-800']}
+              />
+            </View>
+            <TouchableOpacity
+              style={styles.closeButton}
+              // activeOpacity={1} // To prevent touch through
+              onPress={() => {
+                setQratonModal(false),
+                  setQratonType(false),
+                  setQratonAmount(0),
+                  setQratonDescription('');
+              }} // Call closeModal function when touched
+            >
+              <MaterialCommunityIcons
+                name="close"
+                size={24}
+                color={theme['color-secondary-900']}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -201,6 +374,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme['color-dark-gray-200'],
+  },
+
+  row: {
+    flexDirection: 'row',
   },
   header: {
     backgroundColor: theme['color-dark-gray-200'],
@@ -221,6 +398,37 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
   },
+
+  username: {
+    color: theme['color-dark-500'],
+    fontSize: 21,
+    alignSelf: 'center',
+    fontWeight: 'bold',
+  },
+  accountNumber: {
+    color: theme['color-dark-gray-500'],
+    fontSize: 15,
+    alignSelf: 'center',
+    // marginLeft: 10,
+    backgroundColor: theme['color-primary-200'],
+    // padding: 1,
+    // fontWeight: 'bold',
+  },
+
+  btnQrGenerator: {
+    color: theme['color-secondary-900'],
+    fontSize: 15,
+    alignSelf: 'center',
+    backgroundColor: theme['color-secondary-500'],
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+    fontWeight: 'bold',
+    borderColor: theme['color-secondary-900'],
+    borderWidth: 1,
+    borderRadius: 15,
+    marginTop: 10,
+  },
+
   title: {
     fontSize: 15,
     color: theme['color-dark-500'],
@@ -240,21 +448,105 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
   },
-  username: {
-    color: theme['color-dark-500'],
-    fontSize: 21,
-    alignSelf: 'center',
-    marginLeft: 10,
-    fontWeight: 'bold',
+
+  // modal
+
+  modalContainer: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    // padding: 25,
+    // backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
+    minWidth: 300,
+    minHeight: 300,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 10,
+      height: 10,
+    },
+    shadowOpacity: 0.1,
+    shadowColor: theme['color-dark-800'],
+    shadowRadius: 20,
+    elevation: 3,
   },
-  accountNumber: {
-    color: theme['color-dark-gray-400'],
+
+  modalContent: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+    padding: 25,
+  },
+
+  modalText: {
     fontSize: 15,
+    marginBottom: 12,
+    color: theme['color-dark-200'],
+  },
+
+  checkboxContainer: {
+    flexDirection: 'row',
+    marginBottom: 20,
+  },
+
+  checkbox: {
     alignSelf: 'center',
-    marginLeft: 10,
-    backgroundColor: theme['color-primary-200'],
-    // padding: 1,
-    // fontWeight: 'bold',
+  },
+  label: {
+    margin: 8,
+  },
+
+  textValue: {
+    textAlign: 'right',
+    color: theme['color-dark-500'],
+    fontSize: 15,
+    marginTop: 5,
+  },
+  input: {
+    height: 52,
+    borderColor: theme['color-primary-400'],
+    backgroundColor: theme['color-primary-100'],
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 24,
+    fontSize: 25,
+    zIndex: 100,
+    width: 200,
+
+    borderRadius: 10,
+  },
+  inputDescription: {
+    height: 52,
+    borderColor: theme['color-primary-200'],
+    backgroundColor: theme['color-primary-300'],
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 24,
+    paddingTop: 25,
+    marginTop: -12,
+    borderRadius: 10,
+    color: theme['color-primary-800'],
+    // borderBlockColor: theme['color-primary-300'],
+    marginBottom: 25,
+  },
+  checkboxText: {
+    color: theme['color-dark-500'],
+    marginTop: 6,
+  },
+
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: theme['color-secondary-500'],
   },
 });
 

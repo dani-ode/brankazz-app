@@ -13,6 +13,8 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 import {Bounce, Plane} from 'react-native-animated-spinkit';
 
+import Clipboard from '@react-native-clipboard/clipboard';
+
 export default function DepositDetail({route}) {
   const {id} = route.params;
 
@@ -20,12 +22,19 @@ export default function DepositDetail({route}) {
 
   useEffect(() => {
     getDeposit();
-    const interval = setInterval(() => {
-      getDeposit();
-    }, 2500);
 
-    return () => clearInterval(interval);
+    if (deposit == null) {
+      const interval = setInterval(() => {
+        getDeposit();
+      }, 2500);
+
+      return () => clearInterval(interval);
+    }
   }, []);
+
+  const copyToClipboard = text => {
+    Clipboard.setString(text);
+  };
 
   const getDeposit = async () => {
     try {
@@ -84,7 +93,12 @@ export default function DepositDetail({route}) {
               </View>
               <View style={styles.row}>
                 <Text style={styles.label}>Akun Pengirim</Text>
-                <Text style={styles.value}>{deposit.user_out_account}</Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    copyToClipboard(deposit.user_out_account);
+                  }}>
+                  <Text style={styles.value}>{deposit.user_out_account}</Text>
+                </TouchableOpacity>
               </View>
               {/* <Text>{JSON.stringify(deposit)}</Text> */}
             </Card>

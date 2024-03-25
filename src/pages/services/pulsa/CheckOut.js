@@ -120,28 +120,40 @@ const CheckOut = ({route, navigation}) => {
     try {
       setLoading(true);
 
+      const dest_number = number;
+      const product_sku_code = product_sku_code;
+      const product_category = category;
+      const product_brand = brand;
+      const product_type = type;
       const amount = product_price;
+      const connection = 'digiflazz';
+      const description =
+        description ?? 'Belanja' + category + ' ' + brand + ' ' + type;
 
       const userKey = await AsyncStorage.getItem('user-key');
       const userBearerToken = await AsyncStorage.getItem('bearer-token');
 
       console.log(
-        number,
+        dest_number,
         product_sku_code,
-        category,
-        brand,
-        type,
+        product_category,
+        product_brand,
+        product_type,
         amount,
+        connection,
+        description,
         userKey,
         userBearerToken,
       );
       await transaction_create(
-        number,
+        dest_number,
         product_sku_code,
-        category,
-        brand,
-        type,
+        product_category,
+        product_brand,
+        product_type,
         amount,
+        connection,
+        description,
         userKey,
         userBearerToken,
       ).then(res => {

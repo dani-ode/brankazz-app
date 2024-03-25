@@ -1,5 +1,5 @@
 import {View, Text, StyleSheet, FlatList} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -13,19 +13,55 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 import {Bounce, Plane} from 'react-native-animated-spinkit';
 
+import Clipboard from '@react-native-clipboard/clipboard';
+
+import ViewShot, {captureRef} from 'react-native-view-shot';
+
+import Share from 'react-native-share';
+
 export default function TransactionDetail({route}) {
   const {id} = route.params;
 
   const [transaction, setTransaction] = useState({});
+  const ref = useRef();
 
   useEffect(() => {
     getTransaction();
-    const interval = setInterval(() => {
-      getTransaction();
-    }, 2500);
 
-    return () => clearInterval(interval);
+    if (transaction == null) {
+      const interval = setInterval(() => {
+        getTransaction();
+      }, 2500);
+
+      return () => clearInterval(interval);
+    }
   }, []);
+
+  const copyToClipboard = text => {
+    Clipboard.setString(text);
+  };
+
+  const handleShare = async () => {
+    // take an screenshot and share it
+    ref.current.capture().then(uri => {
+      console.log('do something with ', uri);
+
+      const options = {
+        title: 'Share receipt',
+        url: uri,
+        failOnCancel: false,
+        message: 'Check out this receipt',
+      };
+
+      Share.open(options)
+        .then(res => {
+          console.log(res);
+        })
+        .catch(err => {
+          err && console.log(err);
+        });
+    });
+  };
 
   const getTransaction = async () => {
     try {
@@ -59,67 +95,107 @@ export default function TransactionDetail({route}) {
       <View style={styles.container}>
         <ScrollView>
           <Layout style={styles.layout}>
-            <Card>
-              <View style={styles.row}>
-                <Text style={styles.labelTitle}>
-                  Status : {transaction.status}
-                </Text>
-                <Text style={styles.valueTitle}>
-                  {transaction.status == 'Sukses' ||
-                  transaction.status == 'Gagal' ? (
-                    <MaterialCommunityIcons name="printer" size={22} />
-                  ) : (
-                    <Plane size={22} color={theme['color-secondary-800']} />
-                  )}
-                </Text>
-              </View>
-              <View style={styles.line} />
-              <View style={styles.row}>
-                <Text style={styles.label}>Penerima</Text>
-                <Text style={styles.value}>{transaction.dest_number}</Text>
-              </View>
-              <View style={styles.row}>
-                <Text style={styles.label}>Harga</Text>
-                <Text style={styles.value}>
-                  {formatCurrency(transaction.price)}
-                </Text>
-              </View>
-              <View style={styles.row}>
-                <Text style={styles.label}>Nama Produk</Text>
-                <Text style={styles.value}>{transaction.product_name}</Text>
-              </View>
-              <View style={styles.row}>
-                <Text style={styles.label}>Kategori</Text>
-                <Text style={styles.value}>{transaction.product_category}</Text>
-              </View>
-              <View style={styles.row}>
-                <Text style={styles.label}>Brand</Text>
-                <Text style={styles.value}>{transaction.product_brand}</Text>
-              </View>
-              <View style={styles.row}>
-                <Text style={styles.label}>SN</Text>
-                <Text style={styles.value}>
-                  {transaction.sn !== '' ? transaction.sn : '-'}
-                </Text>
-              </View>
-              <View style={styles.row}>
-                <Text style={styles.label}>Deskripsi</Text>
-                <Text style={styles.value}>
-                  {transaction.description !== ''
-                    ? transaction.description
-                    : '-'}
-                </Text>
-              </View>
-              <View style={styles.row}>
-                <Text style={styles.label}>Key Blok</Text>
-                <Text style={styles.value}>{transaction.block_key ?? '-'}</Text>
-              </View>
-              <View style={styles.row}>
-                <Text style={styles.label}>Tanggal</Text>
-                <Text style={styles.value}>{transaction.date}</Text>
-              </View>
-              {/* <Text>{JSON.stringify(transaction)}</Text> */}
-            </Card>
+            <ViewShot
+              ref={ref}
+              options={{
+                fileName: 'Receipt-' + transaction.id,
+                format: 'jpg',
+                quality: 0.9,
+              }}>
+              <Card>
+                <View style={styles.row}>
+                  <Text style={styles.labelTitle}>
+                    Status : {transaction.status}
+                  </Text>
+                  <View>
+                    <View style={styles.row}>
+                      {/* <Text style={styles.valueTitle}>
+                        {transaction.status == 'Sukses' ||
+                        transaction.status == 'Gagal' ? (
+                          <MaterialCommunityIcons name="printer" size={22} />
+                        ) : (
+                          <Plane
+                            size={22}
+                            color={theme['color-secondary-800']}
+                          />
+                        )}
+                      </Text> */}
+                      <TouchableOpacity
+                        onPress={() => {
+                          handleShare();
+                        }}>
+                        <Text style={styles.valueTitle}>
+                          {transaction.status == 'Sukses' ||
+                          transaction.status == 'Gagal' ? (
+                            <MaterialCommunityIcons name="share" size={22} />
+                          ) : (
+                            <Plane
+                              size={22}
+                              color={theme['color-secondary-800']}
+                            />
+                          )}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+                <View style={styles.line} />
+                <View style={styles.row}>
+                  <Text style={styles.label}>Penerima</Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      copyToClipboard(transaction.dest_number);
+                    }}>
+                    <Text style={styles.value}>{transaction.dest_number}</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.label}>Harga</Text>
+                  <Text style={styles.value}>
+                    {formatCurrency(transaction.price)}
+                  </Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.label}>Nama Produk</Text>
+                  <Text style={styles.value}>{transaction.product_name}</Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.label}>Kategori</Text>
+                  <Text style={styles.value}>
+                    {transaction.product_category}
+                  </Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.label}>Brand</Text>
+                  <Text style={styles.value}>{transaction.product_brand}</Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.label}>SN</Text>
+                  <Text style={styles.value}>
+                    {transaction.sn !== '' ? transaction.sn : '-'}
+                  </Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.label}>Deskripsi</Text>
+                  <Text style={styles.value}>
+                    {transaction.description !== ''
+                      ? transaction.description
+                      : '-'}
+                  </Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.label}>Key Blok</Text>
+                  <Text style={styles.value}>
+                    {transaction.block_key ?? '-'}
+                  </Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.label}>Tanggal</Text>
+                  <Text style={styles.value}>{transaction.date}</Text>
+                </View>
+                {/* <Text>{JSON.stringify(transaction)}</Text> */}
+              </Card>
+            </ViewShot>
           </Layout>
         </ScrollView>
       </View>

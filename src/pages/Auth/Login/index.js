@@ -17,11 +17,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {StackActions} from '@react-navigation/native';
 
-import {user_login} from '../../../api/user_api';
+import {user_fcm_token, user_login} from '../../../api/user_api';
 import {Card, Layout} from '@ui-kitten/components';
 
 import {default as theme} from '../../../../theme.json';
 import {Bounce} from 'react-native-animated-spinkit';
+
+import messaging from '@react-native-firebase/messaging';
 
 class Login extends React.Component {
   constructor(props) {
@@ -33,6 +35,7 @@ class Login extends React.Component {
     };
     this.getOnboarding();
     this.getData();
+    this.onDisplayNotification();
   }
 
   getOnboarding = async () => {
@@ -46,6 +49,10 @@ class Login extends React.Component {
     } catch (e) {
       console.error(e);
     }
+  };
+
+  onDisplayNotification = async () => {
+    await messaging().requestPermission();
   };
 
   getData = async () => {
@@ -67,23 +74,58 @@ class Login extends React.Component {
       console.log('trying to login ...');
       this.setState({isLoading: true});
 
-      const {email, password} = this.state;
-      await user_login(email, password).then(res => {
-        if (res.status === 200) {
-          console.log('stroed user');
-          AsyncStorage.setItem('user-id', JSON.stringify(res.data.data.id));
-          AsyncStorage.setItem('user-key', res.data.data.key);
-          AsyncStorage.setItem('bearer-token', res.data.data.token);
-          // console.log(res.data.data);
+      const authStatus = await messaging().requestPermission();
 
-          console.log('logged in');
-          this.props.navigation.dispatch(StackActions.replace('Pages'));
-        } else {
-          this.setState({isLoading: false});
-          console.log('failed to login');
-          this.setState({isLoading: false});
-        }
-      });
+      const {email, password} = this.state;
+
+      const enabled =
+        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+      if (enabled) {
+        await user_login(email, password).then(res => {
+          if (res.status === 200) {
+            console.log('stroed user');
+
+            const userId = res.data.data.id;
+            const userKey = res.data.data.key;
+            const userBearerToken = res.data.data.token;
+
+            AsyncStorage.setItem('user-id', JSON.stringify(userId));
+            AsyncStorage.setItem('user-key', userKey);
+            AsyncStorage.setItem('bearer-token', userBearerToken);
+            // console.log(res.data.data);
+
+            // set user personal FCM Token
+            messaging()
+              .getToken()
+              .then(token => {
+                user_fcm_token(userId, token, userKey, userBearerToken).then(
+                  res => {
+                    // console.log(res.status);
+                    if (res.status === 201) {
+                      console.log('stored fcm token');
+                    }
+                  },
+                );
+                console.log('FCM Token: ' + token);
+              });
+
+            console.log('logged in');
+            this.props.navigation.dispatch(StackActions.replace('Pages'));
+          } else {
+            this.setState({isLoading: false});
+            console.log('failed to login');
+            this.setState({isLoading: false});
+          }
+        });
+
+        console.log('Authorization status:', authStatus);
+      } else {
+        this.setState({isLoading: false});
+
+        this.onDisplayNotification();
+      }
     } catch (error) {
       console.log('failed to login');
       this.setState({isLoading: false});
