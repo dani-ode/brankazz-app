@@ -89,13 +89,20 @@ const InputDepositNominal = ({route, navigation}) => {
     }
   };
 
-  const submit = async nominal => {
+  const submit = async (nominal, description) => {
     try {
-      setLoading(true);
-
       const method = payment_method;
       const provider = provider_name;
-      const amount = nominal;
+      let amount = nominal.replace(/\./g, '');
+
+      let intAmount = parseInt(amount);
+
+      if (intAmount <= 10000) {
+        Alert.alert('Nominal Kurang', 'Minimal deposit 10.000');
+        console.log('kurang');
+        return;
+      }
+
       const partner = partner_kampua_number;
       const third_party = 'moota';
 
@@ -103,22 +110,27 @@ const InputDepositNominal = ({route, navigation}) => {
       const userBearerToken = await AsyncStorage.getItem('bearer-token');
 
       console.log(
+        userBearerToken,
+        userKey,
         method,
         provider,
         amount,
         partner,
         third_party,
-        userKey,
-        userBearerToken,
+        description,
       );
+
+      setLoading(true);
+
       await deposit_create(
+        userBearerToken,
+        userKey,
         method,
         provider,
         amount,
         partner,
         third_party,
-        userKey,
-        userBearerToken,
+        description,
       ).then(res => {
         // console.log(res.status);
         if (res.status === 201) {
@@ -134,9 +146,47 @@ const InputDepositNominal = ({route, navigation}) => {
     }
   };
 
+  const formatAmount = value => {
+    // Remove zero on the left
+    let formattedValue = value.replace(/^0+/, '');
+
+    // Remove non-digit characters
+    formattedValue = formattedValue.replace(/\D/g, '');
+
+    // Format the number with commas
+    formattedValue = formattedValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+    return formattedValue;
+  };
+
+  // Function to handle input change
+  const handleInputChange = text => {
+    const formattedValue = formatAmount(text);
+    // console.log(formattedValue);
+    setNominal(formattedValue);
+  };
+
   function formatCurrency(amount) {
     amount = amount.toFixed(0).replace(/(\d)(?=(\d{3})+\b)/g, '$1.');
     return amount;
+  }
+
+  function convertToReadable(text) {
+    if (!text) {
+      return text;
+    }
+    // Pisahkan kata-kata dengan underscore
+    let words = text.split('_');
+
+    // Ubah setiap kata menjadi huruf kapital di awal
+    for (let i = 0; i < words.length; i++) {
+      words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1);
+    }
+
+    // Gabungkan kembali kata-kata menjadi satu string
+    let result = words.join(' ');
+
+    return result;
   }
 
   return (
@@ -150,8 +200,9 @@ const InputDepositNominal = ({route, navigation}) => {
                 style={styles.input}
                 placeholder="Nominal"
                 autoFocus={true}
+                value={nominal}
                 placeholderTextColor={theme['color-primary-500']}
-                onChangeText={nominal => setNominal(nominal)}
+                onChangeText={nominal => handleInputChange(nominal)}
                 maxLength={20}
               />
               <TextInput
@@ -185,7 +236,9 @@ const InputDepositNominal = ({route, navigation}) => {
                 <Text style={styles.text}>Tipe </Text>
               </View>
               <View style={styles.col}>
-                <Text style={styles.textValue}>{payment_method}</Text>
+                <Text style={styles.textValue}>
+                  {convertToReadable(payment_method)}
+                </Text>
               </View>
             </View>
             <View style={styles.row}>
@@ -202,7 +255,7 @@ const InputDepositNominal = ({route, navigation}) => {
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
-              submit(nominal);
+              submit(nominal, description);
             }}>
             <View style={styles.row}>
               <View style={styles.col}>
@@ -296,6 +349,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
     zIndex: 100,
 
+    fontWeight: 'bold',
     borderRadius: 10,
   },
   inputDescription: {

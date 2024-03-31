@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, TextInput} from 'react-native';
+import {View, Text, StyleSheet, TextInput, Alert} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,6 +14,7 @@ import {default as theme} from '../../../../theme.json';
 import {user_profile} from '../../../api/user_api';
 
 import {Bounce} from 'react-native-animated-spinkit';
+import AmountInput from '../../../components/AmountInput';
 
 const CheckoutKmp = ({route, navigation}) => {
   const {
@@ -37,6 +38,25 @@ const CheckoutKmp = ({route, navigation}) => {
   useEffect(() => {
     getUser();
   }, []);
+
+  const formatAmount = value => {
+    // Remove zero on the left
+    let formattedValue = value.replace(/^0+/, '');
+
+    // Remove non-digit characters
+    formattedValue = formattedValue.replace(/\D/g, '');
+
+    // Format the number with commas
+    formattedValue = formattedValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+    return formattedValue;
+  };
+
+  // Function to handle input change
+  const handleInputChange = text => {
+    const formattedValue = formatAmount(text);
+    setNominal(formattedValue);
+  };
 
   const getUser = async () => {
     try {
@@ -63,12 +83,36 @@ const CheckoutKmp = ({route, navigation}) => {
     try {
       setLoading(true);
 
+      if (nominal == '') {
+        setLoading(false);
+        Alert.alert('Perhatian', 'Nominal harus diisi');
+        return;
+      }
+
+      const amount = nominal.replace(/\./g, '');
+
+      const intAmount = parseInt(amount);
+
+      if (intAmount < 100) {
+        setLoading(false);
+        Alert.alert('Nominal Kurang', 'Saat ini minimal transfer 100');
+        return;
+      }
+      if (intAmount > 5000000) {
+        setLoading(false);
+        Alert.alert(
+          'Nominal melebihi',
+          'Saat ini Anda hanya bisa mengirim maksimal 5.000.000 ke akun ' +
+            partner_name,
+        );
+        return;
+      }
+
       const dest_number = number;
       const product_sku_code = 'kmp_' + nominal;
       const product_category = category;
       const product_brand = brand;
       const product_type = type;
-      const amount = nominal;
       const connection = 'brankazz';
       const new_description = description ?? 'Transfer sesama';
 
@@ -76,6 +120,8 @@ const CheckoutKmp = ({route, navigation}) => {
       const userBearerToken = await AsyncStorage.getItem('bearer-token');
 
       console.log(
+        userBearerToken,
+        userKey,
         dest_number,
         product_sku_code,
         product_category,
@@ -84,10 +130,10 @@ const CheckoutKmp = ({route, navigation}) => {
         amount,
         connection,
         new_description,
-        userKey,
-        userBearerToken,
       );
       await transaction_create(
+        userBearerToken,
+        userKey,
         dest_number,
         product_sku_code,
         product_category,
@@ -96,8 +142,6 @@ const CheckoutKmp = ({route, navigation}) => {
         amount,
         connection,
         new_description,
-        userKey,
-        userBearerToken,
       ).then(res => {
         // console.log(res.status);
         if (res.status === 201) {
@@ -113,6 +157,24 @@ const CheckoutKmp = ({route, navigation}) => {
     }
   };
 
+  function convertToReadable(text) {
+    if (!text) {
+      return text;
+    }
+    // Pisahkan kata-kata dengan underscore
+    let words = text.split('_');
+
+    // Ubah setiap kata menjadi huruf kapital di awal
+    for (let i = 0; i < words.length; i++) {
+      words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1);
+    }
+
+    // Gabungkan kembali kata-kata menjadi satu string
+    let result = words.join(' ');
+
+    return result;
+  }
+
   function formatCurrency(amount) {
     amount = amount.toFixed(0).replace(/(\d)(?=(\d{3})+\b)/g, '$1.');
     return amount;
@@ -123,6 +185,9 @@ const CheckoutKmp = ({route, navigation}) => {
       <SafeAreaView style={styles.container}>
         <ScrollView>
           <Card style={styles.card}>
+            {/* <AmountInput onAmountChange={handleAmountChange} />
+            <Text>Amount: {amountValue}</Text> */}
+
             <View style={styles.nominal}>
               <TextInput
                 keyboardType="numeric"
@@ -137,9 +202,12 @@ const CheckoutKmp = ({route, navigation}) => {
                 ]}
                 placeholder="Nominal"
                 autoFocus={true}
-                value={amount_code == '02' ? set_amount : nominal}
+                value={
+                  amount_code == '02' ? set_amount : nominal == 0 ? '' : nominal
+                }
                 placeholderTextColor={theme['color-primary-500']}
-                onChangeText={nominal => setNominal(nominal)}
+                // onChangeText={nominal => setNominal(nominal)}
+                onChangeText={nominal => handleInputChange(nominal)}
                 maxLength={20}
                 editable={amount_code == '02' ? false : true}
                 selectTextOnFocus={amount_code == '02' ? false : true}
@@ -150,7 +218,13 @@ const CheckoutKmp = ({route, navigation}) => {
                 placeholderTextColor={theme['color-primary-500']}
                 onChangeText={description => setDescription(description)}
                 maxLength={20}
-                value={amount_code == '02' ? set_description : description}
+                value={
+                  amount_code == '02'
+                    ? set_description
+                    : description == '-'
+                    ? ''
+                    : description
+                }
                 editable={amount_code == '02' ? false : true}
                 selectTextOnFocus={amount_code == '02' ? false : true}
               />
@@ -178,7 +252,9 @@ const CheckoutKmp = ({route, navigation}) => {
                 <Text style={styles.text}>Category </Text>
               </View>
               <View style={styles.col}>
-                <Text style={styles.textValue}>{category}</Text>
+                <Text style={styles.textValue}>
+                  {convertToReadable(category)}
+                </Text>
               </View>
             </View>
             <View style={styles.row}>
@@ -186,7 +262,7 @@ const CheckoutKmp = ({route, navigation}) => {
                 <Text style={styles.text}>Brand </Text>
               </View>
               <View style={styles.col}>
-                <Text style={styles.textValue}>{brand}</Text>
+                <Text style={styles.textValue}>{convertToReadable(brand)}</Text>
               </View>
             </View>
             <View style={styles.row}>
@@ -194,7 +270,7 @@ const CheckoutKmp = ({route, navigation}) => {
                 <Text style={styles.text}>Type</Text>
               </View>
               <View style={styles.col}>
-                <Text style={styles.textValue}>{type}</Text>
+                <Text style={styles.textValue}>{convertToReadable(type)}</Text>
               </View>
             </View>
 

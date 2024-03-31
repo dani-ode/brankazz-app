@@ -2,7 +2,7 @@ import {View, Text, StyleSheet, TextInput, Alert} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {account_ref, transaction_create} from '../../../api/transaction_api';
+import {account_ref, postpaid_inquiry} from '../../../api/transaction_api';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Card} from '@ui-kitten/components';
 
@@ -16,7 +16,27 @@ import {user_profile} from '../../../api/user_api';
 import {Bounce, Wave} from 'react-native-animated-spinkit';
 
 const InputEwalletNominal = ({route, navigation}) => {
-  const {user_balance, category, brand, number, name, code} = route.params;
+  const {
+    user_balance,
+    category,
+    brand,
+    number,
+    name,
+    code,
+    relativeCode,
+    checkUserCode,
+  } = route.params;
+
+  console.log(
+    user_balance,
+    category,
+    brand,
+    number,
+    name,
+    code,
+    relativeCode,
+    checkUserCode,
+  );
 
   const [user, setUser] = useState({});
   const [userWallet, setUserWallet] = useState({});
@@ -26,15 +46,18 @@ const InputEwalletNominal = ({route, navigation}) => {
 
   const [isLoading, setLoading] = useState(true);
 
-  const [refreshTime, setRefreshTime] = useState(2500);
-
   useEffect(() => {
     getUser();
-    getUserWallet();
-    const interval = setInterval(() => {
+
+    if (checkUserCode) {
       getUserWallet();
-    }, refreshTime);
-    return () => clearInterval(interval);
+      if (userWallet == null) {
+        const interval = setInterval(() => {
+          getUserWallet();
+        }, 5000);
+        return () => clearInterval(interval);
+      }
+    }
   }, []);
 
   const getUser = async () => {
@@ -63,7 +86,7 @@ const InputEwalletNominal = ({route, navigation}) => {
       const userKey = await AsyncStorage.getItem('user-key');
       const userBearerToken = await AsyncStorage.getItem('bearer-token');
 
-      const product_sku_code = code + 'check_user';
+      const product_sku_code = checkUserCode;
 
       await account_ref(
         userKey,
@@ -75,9 +98,6 @@ const InputEwalletNominal = ({route, navigation}) => {
         if (res.status === 200) {
           //   console.log(res.data.data.name);
           setUserWallet(res.data.data);
-          if (res.data.data.name != null) {
-            setRefreshTime(25000);
-          }
         }
       });
     } catch (error) {
@@ -88,41 +108,108 @@ const InputEwalletNominal = ({route, navigation}) => {
 
   const submit = async (number, nominal) => {
     try {
+      if (!relativeCode) {
+        Alert.alert('Error', 'Saat ini ' + brand + ' hanya untuk pascabayar');
+        return;
+      }
+      if (!checkUserCode && !userWallet.name) {
+        Alert.alert(
+          'Nama belum ditemukan',
+          'Pastikan nomor yang anda masukkan benar',
+        );
+        return;
+      }
+      if (!nominal) {
+        Alert.alert('Error', 'Nominal harus diisi');
+        return;
+      }
+
+      if (nominal == '') {
+        setLoading(false);
+        Alert.alert('Perhatian', 'Nominal harus diisi');
+        return;
+      }
+
+      const amount = nominal.replace(/\./g, '');
+
+      const intAmount = parseInt(amount);
+
+      if (intAmount < 2000) {
+        setLoading(false);
+        Alert.alert(
+          'Nominal Kurang',
+          'Saat ini minimal transfer ke E-Wallet 2.000',
+        );
+        return;
+      }
+      if (intAmount > 500000) {
+        setLoading(false);
+        Alert.alert(
+          'Nominal melebihi',
+          'Saat ini Anda hanya bisa mengirim maksimal 500.000 ke E-Wallet',
+        );
+        return;
+      }
+
+      // .toString().replace(/./g, '')
+
       setLoading(true);
 
-      const product_sku_code = code + nominal;
+      const product_sku_code = relativeCode;
       let type = 'pascabayar';
+
+      const dest_number = number;
+      // const product_sku_code = product_sku_code;
+      const product_category = category;
+      const product_brand = brand;
+      const product_type = type;
+      const connection = 'digiflazz';
+      const description =
+        description ?? 'Transaksi ' + category + ' ' + brand + ' ' + type;
 
       const userKey = await AsyncStorage.getItem('user-key');
       const userBearerToken = await AsyncStorage.getItem('bearer-token');
 
       console.log(
-        number,
-        product_sku_code,
-        category,
-        brand,
-        type,
-        nominal,
-        userKey,
         userBearerToken,
+        userKey,
+        dest_number,
+        product_sku_code,
+        amount,
       );
-      await transaction_create(
-        number,
-        product_sku_code,
-        category,
-        brand,
-        type,
-        nominal,
-        userKey,
+      await postpaid_inquiry(
         userBearerToken,
+        userKey,
+        dest_number,
+        product_sku_code,
+        amount,
       ).then(res => {
         // console.log(res.status);
         if (res.status === 201) {
           console.log(res.data.data);
-          console.log('Transaction ID' + res.data.data.id);
+
+          // Extracting desired data
+          const admin_fee = res.data.data.digiflazz_data.admin;
+          const product_price = res.data.data.digiflazz_data.selling_price;
+          const ref_id = res.data.data.digiflazz_data.ref_id;
+          const signature = res.data.data.signature;
+
+          // console.log(admin_fee, product_price, ref_id, signature);
 
           setLoading(false);
-          navigation.replace('TransactionDetail', {id: res.data.data.id});
+          navigation.replace('EwalletCheckOut', {
+            type,
+            user_balance,
+            category,
+            brand,
+            product_sku_code,
+            ref_id,
+            number,
+            name,
+            admin_fee,
+            product_price,
+            signature,
+          });
         }
       });
     } catch (error) {
@@ -157,31 +244,71 @@ const InputEwalletNominal = ({route, navigation}) => {
     return amount;
   }
 
+  const formatAmount = value => {
+    // Remove zero on the left
+    let formattedValue = value.replace(/^0+/, '');
+
+    // Remove non-digit characters
+    formattedValue = formattedValue.replace(/\D/g, '');
+
+    // Format the number with commas
+    formattedValue = formattedValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+    return formattedValue;
+  };
+  // Function to handle input change
+  const handleInputChange = text => {
+    const formattedValue = formatAmount(text);
+    // console.log(formattedValue);
+    setNominal(formattedValue);
+  };
+
+  function convertToReadable(text) {
+    if (!text) {
+      return text;
+    }
+    // Pisahkan kata-kata dengan underscore
+    let words = text.split('_');
+
+    // Ubah setiap kata menjadi huruf kapital di awal
+    for (let i = 0; i < words.length; i++) {
+      words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1);
+    }
+
+    // Gabungkan kembali kata-kata menjadi satu string
+    let result = words.join(' ');
+
+    return result;
+  }
+
   return (
     <>
       <SafeAreaView style={styles.container}>
         <ScrollView>
           <Card style={styles.card}>
-            <View style={styles.nominal}>
-              <TextInput
-                keyboardType="numeric"
-                style={styles.input}
-                placeholder="Nominal"
-                autoFocus={true}
-                placeholderTextColor={theme['color-primary-500']}
-                onChangeText={nominal => setNominal(nominal)}
-                maxLength={20}
-              />
-              <TextInput
-                style={styles.inputDescription}
-                placeholder="Catatan ..."
-                placeholderTextColor={theme['color-primary-500']}
-                onChangeText={description => setDescription(description)}
-                maxLength={20}
-              />
-            </View>
+            <View style={{display: relativeCode ? 'flex' : 'none'}}>
+              <View style={styles.nominal}>
+                <TextInput
+                  keyboardType="numeric"
+                  style={styles.input}
+                  placeholder="Nominal"
+                  autoFocus={true}
+                  value={nominal}
+                  placeholderTextColor={theme['color-primary-500']}
+                  onChangeText={nominal => handleInputChange(nominal)}
+                  maxLength={20}
+                />
+                <TextInput
+                  style={styles.inputDescription}
+                  placeholder="Catatan ..."
+                  placeholderTextColor={theme['color-primary-500']}
+                  onChangeText={description => setDescription(description)}
+                  maxLength={20}
+                />
+              </View>
 
-            <View style={styles.line} />
+              <View style={styles.line} />
+            </View>
             <View style={styles.row}>
               <View style={styles.col}>
                 <Text style={styles.text}>Number </Text>
@@ -196,8 +323,10 @@ const InputEwalletNominal = ({route, navigation}) => {
               </View>
               <View style={styles.col}>
                 <Text style={styles.textValue}>
-                  {userWallet.name != '' ? (
+                  {userWallet.name ? (
                     userWallet.name
+                  ) : !checkUserCode ? (
+                    'tanpa cek nama'
                   ) : (
                     <Wave size={16} color={theme['color-primary-600']} />
                   )}
@@ -209,7 +338,9 @@ const InputEwalletNominal = ({route, navigation}) => {
                 <Text style={styles.text}>Category </Text>
               </View>
               <View style={styles.col}>
-                <Text style={styles.textValue}>{category}</Text>
+                <Text style={styles.textValue}>
+                  {convertToReadable(category)}
+                </Text>
               </View>
             </View>
             <View style={styles.row}>
@@ -230,26 +361,29 @@ const InputEwalletNominal = ({route, navigation}) => {
               </View>
             </View> */}
           </Card>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              submit(number, nominal);
-            }}>
-            <View style={styles.row}>
-              <View style={styles.col}>
-                <Text style={styles.totalText}>
-                  {/* Total : {formatCurrency(product_price)},00 */}
-                </Text>
+
+          <View style={{display: relativeCode ? 'flex' : 'none'}}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                submit(number, nominal);
+              }}>
+              <View style={styles.row}>
+                <View style={styles.col}>
+                  <Text style={styles.totalText}>
+                    {/* Total : {formatCurrency(product_price)},00 */}
+                  </Text>
+                </View>
+                <View style={styles.col}>
+                  <Text style={styles.buttonText}>
+                    Lanjutkan{' '}
+                    <MaterialCommunityIcons name="arrow-right" size={18} />
+                  </Text>
+                </View>
               </View>
-              <View style={styles.col}>
-                <Text style={styles.buttonText}>
-                  Check Out{' '}
-                  <MaterialCommunityIcons name="arrow-right" size={18} />
-                </Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-          <Text style={styles.sepparator}> ---- Atau Pilih Nominal ----</Text>
+            </TouchableOpacity>
+            <Text style={styles.sepparator}> ---- Atau Pilih Nominal ----</Text>
+          </View>
           <View style={styles.sugesstion}>
             <TouchableOpacity
               style={[
@@ -357,7 +491,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     fontSize: 25,
     zIndex: 100,
-
+    fontWeight: 'bold',
     borderRadius: 10,
   },
   inputDescription: {

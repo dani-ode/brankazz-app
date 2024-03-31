@@ -36,6 +36,7 @@ import InputMeterNumber from '../pages/services/pln/InputMeterNumber';
 import BankList from '../pages/services/bank/BankList';
 import DepositDetail from '../pages/Mutasi/Deposit/DepositDetail';
 import InputDepositNominal from '../pages/Exchange/InputDepositNominal';
+import EwalletCheckOut from '../pages/services/emoney/EwalletCheckOut';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -245,7 +246,7 @@ export class Routes extends Component {
           <Stack.Screen
             name="ExchangeInputDepositNominal"
             component={InputDepositNominal}
-            options={{title: 'Antrian Penawaran'}}
+            options={{title: 'Input Nominal'}}
             initialParams={{
               partner_kampua_number: '',
               ask_quantity: '',
@@ -354,6 +355,8 @@ export class Routes extends Component {
               category: '',
               brand: '',
               code: '',
+              relativeCode: '',
+              checkUserCode: '',
             }}
           />
           <Stack.Screen
@@ -365,9 +368,26 @@ export class Routes extends Component {
               category: '',
               brand: '',
               code: '',
+              relativeCode: '',
+              checkUserCode: '',
+            }}
+          />
+          <Stack.Screen
+            name="EwalletCheckOut"
+            component={EwalletCheckOut}
+            options={{title: 'Masukkan Nominal'}}
+            initialParams={{
+              type: '',
+              user_balance: '',
+              category: '',
+              brand: '',
+              product_sku_code: '',
               number: '',
               name: '',
-              code: '',
+              ref_id: '',
+              admin_fee: '',
+              product_price: '',
+              signature: '',
             }}
           />
           {/* Bank */}

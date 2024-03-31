@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, FlatList} from 'react-native';
+import {View, Text, StyleSheet, FlatList, Image} from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,6 +18,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import ViewShot, {captureRef} from 'react-native-view-shot';
 
 import Share from 'react-native-share';
+import Images from '../../../assets/images';
 
 export default function TransactionDetail({route}) {
   const {id} = route.params;
@@ -28,10 +29,10 @@ export default function TransactionDetail({route}) {
   useEffect(() => {
     getTransaction();
 
-    if (transaction == null) {
+    if (transaction.block_key == null) {
       const interval = setInterval(() => {
         getTransaction();
-      }, 2500);
+      }, 10000);
 
       return () => clearInterval(interval);
     }
@@ -50,7 +51,6 @@ export default function TransactionDetail({route}) {
         title: 'Share receipt',
         url: uri,
         failOnCancel: false,
-        message: 'Check out this receipt',
       };
 
       Share.open(options)
@@ -74,6 +74,7 @@ export default function TransactionDetail({route}) {
         // console.log(res);
         if (res.status === 200) {
           console.log(res.data.data.status);
+
           setTransaction(res.data.data);
           // setLoading(false);
         }
@@ -90,6 +91,24 @@ export default function TransactionDetail({route}) {
     return amount;
   }
 
+  function convertToReadable(text) {
+    if (!text) {
+      return text;
+    }
+    // Pisahkan kata-kata dengan underscore
+    let words = text.split('_');
+
+    // Ubah setiap kata menjadi huruf kapital di awal
+    for (let i = 0; i < words.length; i++) {
+      words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1);
+    }
+
+    // Gabungkan kembali kata-kata menjadi satu string
+    let result = words.join(' ');
+
+    return result;
+  }
+
   return (
     <>
       <View style={styles.container}>
@@ -98,14 +117,40 @@ export default function TransactionDetail({route}) {
             <ViewShot
               ref={ref}
               options={{
-                fileName: 'Receipt-' + transaction.id,
+                fileName: 'debitReceipt-' + transaction.id,
                 format: 'jpg',
                 quality: 0.9,
               }}>
-              <Card>
+              <Card style={styles.receiptCard}>
+                <View style={[styles.row, styles.header]}>
+                  <Image
+                    source={Images.App.brankazzLogo}
+                    style={{height: 28, width: 28, marginRight: 8}}
+                  />
+                  <View style={styles.headerTitle}>
+                    <Text style={styles.title}>BRANKAZZ</Text>
+                    <Text style={styles.tagline}>
+                      PT. BRANKAZZ ELEKTRONIK INDONESIA
+                    </Text>
+                  </View>
+                </View>
                 <View style={styles.row}>
-                  <Text style={styles.labelTitle}>
-                    Status : {transaction.status}
+                  <Text
+                    style={[
+                      styles.labelTitle,
+                      {
+                        color:
+                          transaction.status == 'Gagal'
+                            ? 'red'
+                            : transaction.status == 'Sukses'
+                            ? 'green'
+                            : '#2e3d49',
+                      },
+                    ]}>
+                    Status :{' '}
+                    {transaction.status == 'Sukses'
+                      ? 'Settlement'
+                      : transaction.status}
                   </Text>
                   <View>
                     <View style={styles.row}>
@@ -140,59 +185,112 @@ export default function TransactionDetail({route}) {
                   </View>
                 </View>
                 <View style={styles.line} />
-                <View style={styles.row}>
-                  <Text style={styles.label}>Penerima</Text>
-                  <TouchableOpacity
-                    onPress={() => {
-                      copyToClipboard(transaction.dest_number);
-                    }}>
-                    <Text style={styles.value}>{transaction.dest_number}</Text>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.row}>
-                  <Text style={styles.label}>Harga</Text>
-                  <Text style={styles.value}>
-                    {formatCurrency(transaction.price)}
-                  </Text>
-                </View>
-                <View style={styles.row}>
-                  <Text style={styles.label}>Nama Produk</Text>
-                  <Text style={styles.value}>{transaction.product_name}</Text>
-                </View>
-                <View style={styles.row}>
-                  <Text style={styles.label}>Kategori</Text>
-                  <Text style={styles.value}>
-                    {transaction.product_category}
-                  </Text>
-                </View>
-                <View style={styles.row}>
-                  <Text style={styles.label}>Brand</Text>
-                  <Text style={styles.value}>{transaction.product_brand}</Text>
-                </View>
-                <View style={styles.row}>
-                  <Text style={styles.label}>SN</Text>
-                  <Text style={styles.value}>
-                    {transaction.sn !== '' ? transaction.sn : '-'}
-                  </Text>
-                </View>
-                <View style={styles.row}>
-                  <Text style={styles.label}>Deskripsi</Text>
-                  <Text style={styles.value}>
-                    {transaction.description !== ''
-                      ? transaction.description
-                      : '-'}
-                  </Text>
-                </View>
-                <View style={styles.row}>
+                <View style={styles.transactionInfo}>
+                  <View style={styles.row}>
+                    <Text style={styles.label}>Akun Penerima</Text>
+                    <TouchableOpacity
+                      onPress={() => {
+                        copyToClipboard(transaction.dest_number);
+                      }}>
+                      <Text style={styles.value}>
+                        {transaction.dest_number}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View
+                    style={[
+                      styles.row,
+                      {
+                        display:
+                          transaction.product_name == 'kampua'
+                            ? 'flex'
+                            : 'none',
+                      },
+                    ]}>
+                    <Text style={styles.label}>Nama Penerima</Text>
+                    <Text style={styles.value}>{transaction.user_in_name}</Text>
+                  </View>
+                  <View style={styles.row}>
+                    <Text style={styles.label}>Harga</Text>
+                    <Text style={styles.value}>
+                      {formatCurrency(transaction.price)}
+                    </Text>
+                  </View>
+                  <View style={styles.row}>
+                    <Text style={styles.label}>Deskripsi</Text>
+                    <Text style={styles.value}>
+                      {transaction.description != ''
+                        ? transaction.description
+                        : '-'}
+                    </Text>
+                  </View>
+                  <View style={styles.row}>
+                    <Text style={styles.label}>Nama Produk</Text>
+                    <Text style={styles.value}>
+                      {convertToReadable(transaction.product_name)}
+                    </Text>
+                  </View>
+                  <View style={styles.row}>
+                    <Text style={styles.label}>Kategori</Text>
+                    <Text style={styles.value}>
+                      {convertToReadable(transaction.product_category)}
+                    </Text>
+                  </View>
+                  <View style={styles.row}>
+                    <Text style={styles.label}>Brand</Text>
+                    <Text style={styles.value}>
+                      {convertToReadable(transaction.product_brand)}
+                    </Text>
+                  </View>
+                  <View style={styles.row}>
+                    <Text style={styles.label}>SN</Text>
+                    <Text style={styles.value}>
+                      {transaction.sn !== '' ? transaction.sn : '-'}
+                    </Text>
+                  </View>
+                  <View style={styles.row}>
+                    <Text style={styles.label}>RC</Text>
+                    <Text style={styles.value}>
+                      {transaction.rc !== '' ? transaction.rc : '-'}
+                    </Text>
+                  </View>
+                  {/* <View style={styles.row}>
                   <Text style={styles.label}>Key Blok</Text>
                   <Text style={styles.value}>
                     {transaction.block_key ?? '-'}
                   </Text>
+                </View> */}
+                  <View style={styles.row}>
+                    <Text style={styles.label}>Tanggal</Text>
+                    <Text style={styles.value}>{transaction.date}</Text>
+                  </View>
+
+                  <View style={styles.line} />
+
+                  <View>
+                    <View style={styles.row}>
+                      <Text style={styles.label}>Nama Pengirim</Text>
+                      <Text style={styles.value}>
+                        {transaction.sender_name}
+                      </Text>
+                    </View>
+                    <View style={styles.row}>
+                      <Text style={styles.label}>Akun Pengirim</Text>
+                      <Text style={styles.value}>
+                        {transaction.sender_account_number}
+                      </Text>
+                    </View>
+                  </View>
                 </View>
-                <View style={styles.row}>
-                  <Text style={styles.label}>Tanggal</Text>
-                  <Text style={styles.value}>{transaction.date}</Text>
-                </View>
+
+                <Card style={styles.blockKeyCard}>
+                  {/* <View style={styles.row}> */}
+                  <Text style={styles.bklabel}>
+                    <MaterialCommunityIcons name="key" size={18} />
+                  </Text>
+                  <Text style={styles.bkvalue}>{transaction.block_key}</Text>
+                  {/* </View> */}
+                </Card>
                 {/* <Text>{JSON.stringify(transaction)}</Text> */}
               </Card>
             </ViewShot>
@@ -227,14 +325,34 @@ const styles = StyleSheet.create({
     padding: 24,
     backgroundColor: theme['color-dark-gray-200'],
   },
+  receiptCard: {
+    // paddingVertical: 8,
+  },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
+
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
+
+    justifyContent: 'start',
+  },
+  title: {
+    fontSize: 14,
+    color: theme['color-dark-gray-500'],
+    fontWeight: 'bold',
+  },
+  tagline: {
+    fontSize: 10,
+    color: theme['color-dark-gray-400'],
+  },
   line: {
     borderBottomColor: theme['color-dark-gray-300'],
     borderBottomWidth: 1,
-    marginVertical: 10, // Adjust this value to change the vertical space around the line
+    marginVertical: 3, // Adjust this value to change the vertical space around the line
   },
   labelTitle: {
     fontWeight: 'bold',
@@ -246,6 +364,10 @@ const styles = StyleSheet.create({
     backgroundColor: theme['color-secondary-300'],
     padding: 5,
     borderRadius: 3,
+    marginTop: -10,
+  },
+  transactionInfo: {
+    paddingHorizontal: 10,
   },
   label: {
     fontSize: 14,
@@ -256,5 +378,37 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: theme['color-dark-gray-500'],
     marginTop: 8,
+  },
+
+  blockKeyCard: {
+    marginTop: 10,
+    backgroundColor: theme['color-primary-500'],
+    borderColor: theme['color-primary-400'],
+    // borderRightWidth: 0,
+    // borderBottomWidth: 0,
+    borderRadius: 10,
+    shadowOffset: {
+      width: 20,
+      height: 20,
+    },
+    shadowOpacity: 0.1,
+    shadowColor: theme['color-dark-100'],
+    shadowRadius: 20,
+    elevation: 3,
+  },
+
+  bklabel: {
+    fontSize: 14,
+    color: theme['color-secondary-700'],
+    fontWeight: 'bold',
+    // marginTop: 15,
+    position: 'absolute',
+    backgroundColor: theme['color-secondary-500'],
+    borderRadius: 3,
+  },
+
+  bkvalue: {
+    fontSize: 14,
+    color: theme['color-dark-gray-100'],
   },
 });

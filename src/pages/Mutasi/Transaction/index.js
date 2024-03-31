@@ -19,16 +19,41 @@ import {default as theme} from '../../../../theme.json';
 import {transaction_lists} from '../../../api/mutasi_api';
 
 const Transaction = ({navigation}) => {
-  let date = new Date().getDate();
-  let currentDate = new Date().getDate() + 2;
-  let month = new Date().getMonth();
-  let currentMonth = new Date().getMonth() + 1;
-  let year = new Date().getFullYear();
+  // Mendapatkan tanggal dan waktu saat ini
+  const currentDateTime = new Date();
+
+  // Mendapatkan offset waktu untuk zona waktu Indonesia Tengah (WIB)
+  const timezoneOffsetInHours = 8; // UTC+7 (Indonesia Tengah)
+
+  // Menyesuaikan tanggal dan waktu dengan offset zona waktu
+  const targetTimestamp =
+    currentDateTime.getTime() + timezoneOffsetInHours * 60 * 60 * 1000;
+  const targetFirstDateTime = new Date(targetTimestamp);
+  const targetDateTime = new Date(targetTimestamp);
+
+  // Calculate tomorrow's date
+  targetFirstDateTime.setDate(targetFirstDateTime.getDate() - 6);
+  targetDateTime.setDate(targetDateTime.getDate() + 1);
+
+  // Menampilkan tanggal dan waktu dalam zona waktu Indonesia Tengah
+  // console.log('Tanggal dan Waktu saat ini (WIB):', formattedDateTime);
+
+  let getFirstDate = targetFirstDateTime.getDate();
+  let getFirstMonth = targetFirstDateTime.getMonth() + 1;
+  let getFirstYear = targetFirstDateTime.getFullYear();
+
+  let getEndDate = targetDateTime.getDate();
+  let getEndMonth = targetDateTime.getMonth() + 1;
+  let getEndYear = targetDateTime.getFullYear();
+
+  console.log(getEndMonth);
 
   const [mutasi, setMutasi] = useState([]);
-  const [firstDate, setfirstDate] = useState(year + '-' + month + '-' + date);
+  const [firstDate, setfirstDate] = useState(
+    getFirstYear + '-' + getFirstMonth + '-' + getFirstDate,
+  );
   const [endDate, setEndDate] = useState(
-    year + '-' + currentMonth + '-' + currentDate,
+    getEndYear + '-' + getEndMonth + '-' + getEndDate,
   );
 
   useEffect(() => {
@@ -38,7 +63,6 @@ const Transaction = ({navigation}) => {
   const getMutasi = async () => {
     try {
       const userKey = await AsyncStorage.getItem('user-key');
-
       const userBearerToken = await AsyncStorage.getItem('bearer-token');
 
       console.log(firstDate, endDate, userKey, userBearerToken);
@@ -64,7 +88,9 @@ const Transaction = ({navigation}) => {
   };
 
   function formatCurrency(amount) {
-    amount = amount.toFixed(0).replace(/(\d)(?=(\d{3})+\b)/g, '$1.');
+    amount = Number(amount)
+      .toFixed(0)
+      .replace(/(\d)(?=(\d{3})+\b)/g, '$1.');
     return amount;
   }
 
@@ -113,7 +139,9 @@ const Transaction = ({navigation}) => {
 
 const MutasiItem = ({mutasi, onPress}) => {
   function formatCurrency(amount) {
-    amount = amount.toFixed(0).replace(/(\d)(?=(\d{3})+\b)/g, '$1.');
+    amount = Number(amount)
+      .toFixed(0)
+      .replace(/(\d)(?=(\d{3})+\b)/g, '$1.');
     return amount;
   }
 
@@ -125,10 +153,10 @@ const MutasiItem = ({mutasi, onPress}) => {
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <View style={{flexDirection: 'column'}}>
             <Text style={{color: '#2e3d49', fontWeight: 'bold'}}>
-              {mutasi.product_name}
+              {formatCurrency(mutasi.price)}
             </Text>
             <Text style={{fontWeight: 'light', color: '#57636d', fontSize: 11}}>
-              Tujuan {mutasi.dest_number}
+              No: {mutasi.dest_number} ({mutasi.product_name})
             </Text>
           </View>
           <Text

@@ -11,6 +11,7 @@ import {
   SafeAreaView,
   StatusBar,
   Alert,
+  Linking,
 } from 'react-native';
 
 import {default as theme} from '../../../theme.json';
@@ -29,7 +30,7 @@ const ProfileScreen = ({navigation}) => {
     getUser();
     const interval = setInterval(() => {
       getUser();
-    }, 3500);
+    }, 15000);
     return () => clearInterval(interval);
   }, []);
 
@@ -141,30 +142,35 @@ const ProfileScreen = ({navigation}) => {
       image: 'https://img.icons8.com/color/70/000000/administrator-male.png',
       title: 'Update Akun',
       code: 'update',
+      url: '',
     },
     {
       id: 2,
       image: 'https://img.icons8.com/color/70/000000/cottage.png',
       title: 'Bahasa',
       code: 'language',
+      url: '',
     },
     {
       id: 3,
       image: 'https://img.icons8.com/color/70/000000/filled-like.png',
       title: 'Terms of Service',
       code: 'terms',
+      url: 'https://brankazz.corpo.id/terms',
     },
     {
       id: 4,
       image: 'https://img.icons8.com/color/70/000000/facebook-like.png',
       title: 'Privacy Policy',
       code: 'privacy',
+      url: 'https://brankazz.corpo.id/privacy-policy',
     },
     {
       id: 5,
       image: 'https://img.icons8.com/color/70/000000/shutdown.png',
       title: 'Logout',
       code: 'logout',
+      url: '',
     },
   ];
 
@@ -181,24 +187,75 @@ const ProfileScreen = ({navigation}) => {
     setLoading(false);
   };
 
-  const handleFeatures = code => {
-    if (code === 'logout') {
-      handleLogout();
+  const handleFeatures = item => {
+    if (item.code === 'logout') {
+      Alert.alert(
+        'Log Out',
+        'Apakah Anda yakin ingin keluar?',
+        [
+          {
+            text: 'Cancel',
+            onPress: () => {
+              console.log('Cancel Pressed');
+            },
+            style: 'cancel',
+          },
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK Pressed');
+              setLoading(true);
+              handleLogout();
+            },
+          },
+        ],
+        {cancelable: false},
+      );
     } else {
-      Alert.alert(code);
-      // navigation.navigate(code);
+      console.log(item);
+      if (item.url) {
+        // Alert.alert(item.url);
+        Linking.openURL(item.url);
+      } else {
+        Alert.alert(item.code);
+      }
     }
+  };
+
+  const formatAmount = value => {
+    // Remove zero on the left
+    let formattedValue = value.replace(/^0+/, '');
+
+    // Remove non-digit characters
+    formattedValue = formattedValue.replace(/\D/g, '');
+
+    // Format the number with commas
+    formattedValue = formattedValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+    return formattedValue;
+  };
+
+  // Function to handle input change
+  const handleInputChange = text => {
+    const formattedValue = formatAmount(text);
+    // console.log(formattedValue);
+    setQratonAmount(formattedValue);
   };
 
   const ContentThatGoesAboveTheFlatList = () => {
     return (
       <View style={styles.headerContent}>
-        <Image
-          style={styles.avatar}
-          source={{
-            uri: 'https://bootdey.com/img/Content/avatar/avatar7.png',
-          }}
-        />
+        <View style={{position: 'relative'}}>
+          <Image
+            style={styles.avatar}
+            source={{
+              uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Windows_10_Default_Profile_Picture.svg/512px-Windows_10_Default_Profile_Picture.svg.png',
+              // uri: 'https://bootdey.com/img/Content/avatar/avatar7.png',
+            }}
+          />
+          <View style={styles.imageOverlay} />
+        </View>
+
         <Text style={styles.username}>{user.name}</Text>
 
         <View style={styles.row}>
@@ -265,7 +322,7 @@ const ProfileScreen = ({navigation}) => {
               return (
                 <TouchableOpacity
                   onPress={() => {
-                    handleFeatures(item.code);
+                    handleFeatures(item);
                   }}>
                   <View style={styles.box}>
                     {/* <Image style={styles.icon} source={{uri: item.image}} /> */}
@@ -303,6 +360,11 @@ const ProfileScreen = ({navigation}) => {
                 <CheckBox
                   disabled={false}
                   value={qratonType}
+                  style={styles.checkbox}
+                  tintColors={{
+                    true: theme['color-secondary-800'],
+                    false: theme['color-secondary-800'],
+                  }}
                   onValueChange={newValue => {
                     setQratonType(newValue), setShowQraton(!newValue);
                   }}
@@ -313,15 +375,16 @@ const ProfileScreen = ({navigation}) => {
             <View style={{display: qratonType ? 'flex' : 'none'}}>
               <TextInput
                 keyboardType="numeric"
-                style={styles.input}
+                style={[styles.input, {paddingHorizontal: 20}]}
                 placeholder="Nominal"
-                autoFocus={true}
+                // autoFocus={true}
+                value={qratonAmount}
                 placeholderTextColor={theme['color-primary-500']}
-                onChangeText={qratonAmount => setQratonAmount(qratonAmount)}
+                onChangeText={qratonAmount => handleInputChange(qratonAmount)}
                 maxLength={20}
               />
               <TextInput
-                style={styles.inputDescription}
+                style={[styles.inputDescription, {paddingHorizontal: 20}]}
                 placeholder="Catatan ..."
                 placeholderTextColor={theme['color-primary-500']}
                 onChangeText={qratonDescription =>
@@ -332,13 +395,13 @@ const ProfileScreen = ({navigation}) => {
             </View>
             <View
               style={{
-                display: showQraton || qratonAmount > 0 ? 'flex' : 'none',
+                display: showQraton || qratonAmount != 0 ? 'flex' : 'none',
               }}>
               <QRCode
                 value={generateQRValue(
                   'QRATON',
                   qratonType,
-                  qratonAmount,
+                  qratonAmount.toString().replace(/\./g, ''),
                   user.account_number,
                   user.name,
                   qratonDescription,
@@ -355,6 +418,7 @@ const ProfileScreen = ({navigation}) => {
                   setQratonType(false),
                   setQratonAmount(0),
                   setQratonDescription('');
+                setShowQraton(true);
               }} // Call closeModal function when touched
             >
               <MaterialCommunityIcons
@@ -387,12 +451,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   avatar: {
-    width: 130,
-    height: 130,
+    width: 80,
+    height: 80,
     borderRadius: 63,
     borderWidth: 4,
     borderColor: theme['color-primary-600'],
     marginBottom: 10,
+  },
+  imageOverlay: {
+    position: 'absolute',
+    width: 78,
+    height: 78,
+    borderRadius: 63,
+    borderWidth: 1,
+    borderColor: theme['color-secondary-600'],
+    marginBottom: 10,
+    backgroundColor: theme['color-primary-700'],
+    opacity: 0.4,
   },
   icon: {
     width: 40,
@@ -511,15 +586,17 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   input: {
-    height: 52,
+    height: 45,
+    color: theme['color-dark-500'],
     borderColor: theme['color-primary-400'],
     backgroundColor: theme['color-primary-100'],
     borderWidth: 1,
     borderRadius: 4,
     paddingHorizontal: 24,
-    fontSize: 25,
+    fontSize: 20,
     zIndex: 100,
     width: 200,
+    fontWeight: 'bold',
 
     borderRadius: 10,
   },

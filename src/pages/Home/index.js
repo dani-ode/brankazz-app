@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   TextInput,
   Image,
+  Alert,
 } from 'react-native';
 
 import {Layout, Text, Card} from '@ui-kitten/components';
@@ -28,7 +29,7 @@ const HomeScreen = () => {
     getUser();
     const interval = setInterval(() => {
       getUser();
-    }, 2500);
+    }, 12000);
     return () => clearInterval(interval);
   }, []);
 
@@ -238,6 +239,13 @@ const HomeScreen = () => {
               style={styles.searchInput}
               placeholder="Cari Layanan"
               placeholderTextColor={theme['color-primary-500']}
+              onChangeText={() =>
+                Alert.alert(
+                  'Coming Soon',
+                  // 'Fitur ini sedang dalam tahap pengembangan',
+                  'Belum ada fitur lain',
+                )
+              }
             />
 
             <View style={[styles.row, styles.serviceListAll]}>
@@ -328,7 +336,14 @@ const HomeScreen = () => {
               </TouchableOpacity>
             </View>
             <View style={[styles.row, styles.serviceListAll]}>
-              <TouchableOpacity style={styles.service}>
+              <TouchableOpacity
+                style={styles.service}
+                onPress={() =>
+                  Alert.alert(
+                    'Coming Soon',
+                    'Fitur ini sedang dalam tahap pengembangan',
+                  )
+                }>
                 <View style={[styles.col]}>
                   <View style={[styles.serviceIcon, styles.serviceItemAll]}>
                     <MaterialCommunityIcons
@@ -341,7 +356,14 @@ const HomeScreen = () => {
                 </View>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.service}>
+              <TouchableOpacity
+                style={styles.service}
+                onPress={() =>
+                  Alert.alert(
+                    'Coming Soon',
+                    'Fitur ini sedang dalam tahap pengembangan',
+                  )
+                }>
                 <View style={[styles.col]}>
                   <View style={[styles.serviceIcon, styles.serviceItemAll]}>
                     <MaterialCommunityIcons
@@ -354,7 +376,14 @@ const HomeScreen = () => {
                 </View>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.service}>
+              <TouchableOpacity
+                style={styles.service}
+                onPress={() =>
+                  Alert.alert(
+                    'Coming Soon',
+                    'Fitur ini sedang dalam tahap pengembangan',
+                  )
+                }>
                 <View style={[styles.col]}>
                   <View style={[styles.serviceIcon, styles.serviceItemAll]}>
                     <MaterialCommunityIcons
@@ -367,7 +396,11 @@ const HomeScreen = () => {
                 </View>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.service}>
+              <TouchableOpacity
+                style={styles.service}
+                onPress={() =>
+                  Alert.alert('Coming Soon', 'Belum ada fitur lainnya')
+                }>
                 <View style={[styles.col]}>
                   <View style={[styles.serviceIcon, styles.serviceItemAll]}>
                     <MaterialCommunityIcons

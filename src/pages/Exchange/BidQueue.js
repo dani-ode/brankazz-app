@@ -79,6 +79,10 @@ const BidQueue = ({navigation, route}) => {
     }
   };
 
+  const strUpperCase = text => {
+    return text.toUpperCase();
+  };
+
   return (
     // <GestureHandlerRootView>
     <View style={styles.container}>
@@ -96,26 +100,31 @@ const BidQueue = ({navigation, route}) => {
         snapPoints={snapPoints}
         onChange={handleSheetChanges}>
         <BottomSheetView style={styles.contentContainer}>
-          <Text>Pilih Metode Pembayaran</Text>
+          <Text>- Pilih Metode Pembayaran -</Text>
+
           <FlatList
             data={partnerBillings}
             keyExtractor={item => item.id}
             renderItem={({item}) => {
-              return (
-                <Billing
-                  key={item.id}
-                  billingItem={item}
-                  onPress={() =>
-                    goToInputNominal({
-                      navigation,
-                      account_number,
-                      ask_quantity,
-                      ask_price,
-                      item,
-                    })
-                  }
-                />
-              );
+              if (item.status == 'active') {
+                //do something
+                return (
+                  <Billing
+                    key={item.id}
+                    billingItem={item}
+                    strUpperCase={strUpperCase}
+                    onPress={() =>
+                      goToInputNominal({
+                        navigation,
+                        account_number,
+                        ask_quantity,
+                        ask_price,
+                        item,
+                      })
+                    }
+                  />
+                );
+              }
             }}
           />
         </BottomSheetView>
@@ -146,7 +155,7 @@ const goToInputNominal = ({
   });
 };
 
-const Billing = ({billingItem, onPress}) => {
+const Billing = ({billingItem, strUpperCase, onPress}) => {
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -155,7 +164,8 @@ const Billing = ({billingItem, onPress}) => {
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <View style={{flexDirection: 'column'}}>
             <Text style={{color: '#2e3d49', fontWeight: 'bold'}}>
-              BANK {billingItem.provider_name}
+              {billingItem.payment_method == 'bank_transfer' ? 'BANK ' : ''}
+              {strUpperCase(billingItem.provider_name)}
             </Text>
           </View>
           <Text
@@ -191,6 +201,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

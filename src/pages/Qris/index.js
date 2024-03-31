@@ -18,6 +18,7 @@ import {
 import {default as theme} from '../../../theme.json';
 import {user_profile} from '../../api/user_api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Layout} from '@ui-kitten/components';
 
 const QrisScreen = ({navigation}) => {
   useEffect(() => {
@@ -35,6 +36,8 @@ const QrisScreen = ({navigation}) => {
   const [scanned, setScanned] = useState(false);
 
   const [user, setUser] = useState({});
+
+  const [cameraDevice, setCameraDevice] = useState(false);
 
   const device = useCameraDevice('back');
 
@@ -66,6 +69,14 @@ const QrisScreen = ({navigation}) => {
             description,
           } = extractQratonData(codes[0].value);
 
+          let formattedAmount = amount.replace(/\D/g, '');
+
+          // Format the number with commas
+          formattedAmount = formattedAmount.replace(
+            /\B(?=(\d{3})+(?!\d))/g,
+            ',',
+          );
+
           navigation.navigate('ServiceTransferCheckout', {
             user_balance: user.balance,
             category: 'e_money',
@@ -74,7 +85,7 @@ const QrisScreen = ({navigation}) => {
             number: accountNumber,
             partner_name: accountName,
             amount_code: type,
-            set_amount: amount,
+            set_amount: formattedAmount,
             set_description: description,
           });
         } else {
@@ -182,12 +193,14 @@ const QrisScreen = ({navigation}) => {
     try {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.CAMERA,
-        {
-          title: 'Izinkan Brankazz Mengakses Kamera',
-          message: 'Go to Settings > Permission Manager > Camera',
-        },
+        // {
+        //   title: 'Izinkan Brankazz Mengakses Kamera',
+        //   message: 'Go to Settings > Permission Manager > Camera',
+
+        // },
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        setCameraDevice(true);
         console.log('You can use the camera');
       } else {
         console.log('Camera permission denied');
@@ -195,18 +208,6 @@ const QrisScreen = ({navigation}) => {
     } catch (err) {
       console.warn(err);
     }
-  };
-
-  if (!cameraPermission) {
-    return (
-      <Text>
-        We need your permission to use the camera. Please grant in your
-        settings.
-      </Text>
-    );
-  }
-  const NoCameraDeviceError = () => {
-    return <Text>Fitur ini tidak tersedia pada perangkat Anda!</Text>;
   };
 
   const onBarCodeScanned = ({data}) => {
@@ -236,6 +237,33 @@ const QrisScreen = ({navigation}) => {
       console.error(error);
     }
   };
+
+  if (!cameraPermission) {
+    return (
+      <Text>
+        We need your permission to use the camera. Please grant in your
+        settings.
+      </Text>
+    );
+  }
+  const NoCameraDeviceError = () => {
+    return <Text>Fitur ini tidak tersedia pada perangkat Anda!</Text>;
+  };
+
+  if (!cameraDevice) {
+    // requestCameraPermission();
+    return (
+      // <Layout>
+      <>
+        <Text style={{textAlign: 'center', marginTop: 20}}>Loading...</Text>
+        <Text style={{textAlign: 'center', margin: 20}}>
+          Brankazz memerlukan izin Anda untuk menggunakan kamera. Silakan
+          izinkan di pengaturan Anda, atau pada menu pop-up.
+        </Text>
+      </>
+      // </Layout>
+    );
+  }
 
   if (device == null) return <NoCameraDeviceError />;
   return (

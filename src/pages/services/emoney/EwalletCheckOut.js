@@ -15,15 +15,19 @@ import {user_profile} from '../../../api/user_api';
 
 import {Bounce} from 'react-native-animated-spinkit';
 
-const CheckOut = ({route, navigation}) => {
+const EwalletCheckOut = ({route, navigation}) => {
   const {
-    number,
+    type,
+    user_balance,
     category,
     brand,
     product_sku_code,
-    type,
+    ref_id,
+    number,
+    name,
+    admin_fee,
     product_price,
-    user_balance,
+    signature,
   } = route.params;
 
   const [user, setUser] = useState([['-', '-', '-']]);
@@ -144,6 +148,8 @@ const CheckOut = ({route, navigation}) => {
         amount,
         connection,
         description,
+        ref_id,
+        signature,
       );
       await transaction_create(
         userBearerToken,
@@ -156,6 +162,8 @@ const CheckOut = ({route, navigation}) => {
         amount,
         connection,
         description,
+        ref_id,
+        signature,
       ).then(res => {
         // console.log(res.status);
         if (res.status === 201) {
@@ -258,7 +266,7 @@ const CheckOut = ({route, navigation}) => {
             </Table> */}
             <View style={styles.row}>
               <View style={styles.col}>
-                <Text style={styles.text}>Number </Text>
+                <Text style={styles.text}>Nomor </Text>
               </View>
               <View style={styles.col}>
                 <Text style={styles.textValue}>{number}</Text>
@@ -267,10 +275,20 @@ const CheckOut = ({route, navigation}) => {
             <PlnUserDetail />
             <View style={styles.row}>
               <View style={styles.col}>
-                <Text style={styles.text}>Category </Text>
+                <Text style={styles.text}>Nama </Text>
               </View>
               <View style={styles.col}>
-                <Text style={styles.textValue}>{category}</Text>
+                <Text style={styles.textValue}>{name ?? '-'}</Text>
+              </View>
+            </View>
+            <View style={styles.row}>
+              <View style={styles.col}>
+                <Text style={styles.text}>Kategori </Text>
+              </View>
+              <View style={styles.col}>
+                <Text style={styles.textValue}>
+                  {convertToReadable(category)}
+                </Text>
               </View>
             </View>
             <View style={styles.row}>
@@ -281,21 +299,31 @@ const CheckOut = ({route, navigation}) => {
                 <Text style={styles.textValue}>{brand}</Text>
               </View>
             </View>
-            <View style={styles.row}>
+            {/* <View style={styles.row}>
               <View style={styles.col}>
                 <Text style={styles.text}>Type</Text>
               </View>
               <View style={styles.col}>
-                <Text style={styles.textValue}>{convertToReadable(type)}</Text>
+                <Text style={styles.textValue}>{type}</Text>
+              </View>
+            </View> */}
+            <View style={styles.row}>
+              <View style={styles.col}>
+                <Text style={styles.text}>Nominal</Text>
+              </View>
+              <View style={styles.col}>
+                <Text style={styles.textValue}>
+                  {formatCurrency(product_price - admin_fee)}
+                </Text>
               </View>
             </View>
             <View style={styles.row}>
               <View style={styles.col}>
-                <Text style={styles.text}>Product Price</Text>
+                <Text style={styles.text}>Biaya Admin</Text>
               </View>
               <View style={styles.col}>
                 <Text style={styles.textValue}>
-                  {formatCurrency(product_price)}
+                  {formatCurrency(admin_fee)}
                 </Text>
               </View>
             </View>
@@ -437,4 +465,4 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
 });
-export default CheckOut;
+export default EwalletCheckOut;

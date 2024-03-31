@@ -34,12 +34,16 @@ const FintechList = ({route, navigation}) => {
   const selectFintech = item => {
     const brand = item.brand;
     const code = item.code;
+    const relativeCode = item.relativeCode;
+    const checkUserCode = item.checkUserCode;
 
     navigation.navigate('ServiceEwaletInputNumber', {
       user_balance,
       category,
       brand,
       code,
+      relativeCode,
+      checkUserCode,
     });
   };
 
@@ -48,71 +52,99 @@ const FintechList = ({route, navigation}) => {
       {
         brand: 'Gopay Customer',
         code: 'gopayc_',
+        relativeCode: 'gopay_relative',
+        checkUserCode: 'gopay_check_user',
         logo: Images.FintechLogo.gopaycLogo,
       },
       {
         brand: 'Gopay Driver',
         code: 'gopayd_',
+        relativeCode: 'gopay_relative',
+        checkUserCode: 'gopay_check_user',
         logo: Images.FintechLogo.gopaydLogo,
       },
       {
         brand: 'LinkAja',
         code: 'linkaja_',
+        relativeCode: '',
+        checkUserCode: 'linkaja_check_user',
         logo: Images.FintechLogo.linkajaLogo,
       },
       {
         brand: 'OVO',
         code: 'ovo_',
+        relativeCode: 'ovo_relative',
+        checkUserCode: 'ovo_check_user',
         logo: Images.FintechLogo.ovoLogo,
       },
       {
         brand: 'Shopee Pay',
         code: 'shppay_',
+        relativeCode: 'shppay_relative',
+        checkUserCode: 'shppay_check_user',
         logo: Images.FintechLogo.shppayLogo,
       },
       {
         brand: 'Mitra Shopee',
         code: 'shppaym_',
+        relativeCode: 'shppay_relative',
+        checkUserCode: 'shppay_check_user',
         logo: Images.FintechLogo.shppaymLogo,
       },
       {
         brand: 'Dana',
         code: 'dana_',
+        relativeCode: 'dana_relative',
+        checkUserCode: 'dana_check_user',
         logo: Images.FintechLogo.danaLogo,
       },
       {
         brand: 'i.Saku',
         code: 'isaku_',
+        relativeCode: '',
+        checkUserCode: 'isaku_check_user',
         logo: Images.FintechLogo.isakuLogo,
       },
       {
         brand: 'Maxim Customer',
         code: 'maximc_',
+        relativeCode: '',
+        checkUserCode: '',
         logo: Images.FintechLogo.maximcLogo,
       },
       {
         brand: 'Maxim Driver',
         code: 'maximd_',
+        relativeCode: '',
+        checkUserCode: '',
         logo: Images.FintechLogo.maximdLogo,
       },
       {
         brand: 'Grab Umum',
         code: 'grabu_',
+        relativeCode: '',
+        checkUserCode: '',
         logo: Images.FintechLogo.grabuLogo,
       },
       {
         brand: 'Grab Driver',
         code: 'grabc_',
+        relativeCode: '',
+        checkUserCode: '',
         logo: Images.FintechLogo.grabcLogo,
       },
       {
         brand: 'Sakuku',
         code: 'sakuku_',
+        relativeCode: '',
+        checkUserCode: '',
         logo: Images.FintechLogo.sakukuLogo,
       },
       {
         brand: 'Doku',
         code: 'doku_',
+        relativeCode: '',
+        checkUserCode: '',
         logo: Images.FintechLogo.dokuLogo,
       },
     ]);

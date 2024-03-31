@@ -22,7 +22,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {account_ref} from '../../../api/transaction_api';
 
 const InputEwalletNumber = ({route}) => {
-  const {user_balance, category, brand, code} = route.params;
+  const {user_balance, category, brand, code, relativeCode, checkUserCode} =
+    route.params;
   const navigation = useNavigation();
   const [number, setNumber] = useState(0);
 
@@ -66,7 +67,22 @@ const InputEwalletNumber = ({route}) => {
       const userKey = await AsyncStorage.getItem('user-key');
       const userBearerToken = await AsyncStorage.getItem('bearer-token');
 
-      const product_sku_code = code + 'check_user';
+      const product_sku_code = checkUserCode;
+
+      if (!checkUserCode) {
+        navigation.navigate('ServiceEwalletInputNominal', {
+          user_balance: user_balance,
+          category: category,
+          brand: brand,
+          number: number,
+          name: '',
+          code: code,
+          relativeCode: relativeCode,
+          checkUserCode: checkUserCode,
+        });
+
+        return;
+      }
 
       await account_ref(
         userKey,
@@ -85,6 +101,8 @@ const InputEwalletNumber = ({route}) => {
             number: number,
             name: res.data.data.name,
             code: code,
+            relativeCode: relativeCode,
+            checkUserCode: checkUserCode,
           });
         }
       });

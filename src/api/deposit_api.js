@@ -3,13 +3,14 @@ import ApiManager from './ApiManager';
 import {BRANKAZZ_ACCESS_KEY} from '@env';
 
 const deposit_create = async (
+  userBearerToken,
+  userKey,
   method,
   provider,
   amount,
   partner,
   third_party,
-  userKey,
-  userBearerToken,
+  description,
 ) => {
   try {
     const config = {
@@ -26,6 +27,7 @@ const deposit_create = async (
       amount: amount,
       partner: partner,
       third_party: third_party,
+      description: description,
     };
 
     console.log(bodyParameters);
@@ -49,6 +51,7 @@ const deposit_show = async (id, userKey, userBearerToken) => {
     return res;
   } catch (error) {
     console.error(error);
+    return error;
   }
 };
 

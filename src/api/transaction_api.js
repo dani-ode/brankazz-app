@@ -30,6 +30,8 @@ const transaction_price_list = async (
 };
 
 const transaction_create = async (
+  userBearerToken,
+  userKey,
   dest_number,
   product_sku_code,
   product_category,
@@ -38,8 +40,8 @@ const transaction_create = async (
   amount,
   connection,
   description,
-  userKey,
-  userBearerToken,
+  ref_id,
+  signature,
 ) => {
   try {
     const config = {
@@ -59,12 +61,52 @@ const transaction_create = async (
       amount: amount,
       connection: connection,
       description: description,
+      ref_id: ref_id,
+      signature: signature,
     };
 
     console.log(bodyParameters);
 
+    // return;
+
     const res = await ApiManager.post(
       '/api/transaction',
+      bodyParameters,
+      config,
+    );
+    return res;
+  } catch (error) {
+    console.error(error);
+  }
+};
+const postpaid_inquiry = async (
+  userBearerToken,
+  userKey,
+  dest_number,
+  product_sku_code,
+  amount,
+) => {
+  try {
+    const config = {
+      headers: {
+        'Access-Key': BRANKAZZ_ACCESS_KEY,
+        'User-Key': userKey,
+        Authorization: `Bearer ${userBearerToken}`,
+      },
+    };
+
+    const bodyParameters = {
+      dest_number: dest_number,
+      product_sku_code: product_sku_code,
+      amount: amount,
+    };
+
+    console.log(bodyParameters);
+
+    // return;
+
+    const res = await ApiManager.post(
+      '/api/transaction-inquiry',
       bodyParameters,
       config,
     );
@@ -127,6 +169,7 @@ const account_ref = async (
 export {
   transaction_price_list,
   transaction_create,
+  postpaid_inquiry,
   transaction_show,
   account_ref,
 };

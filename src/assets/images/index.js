@@ -1,4 +1,7 @@
 const Images = {
+  App: {
+    brankazzLogo: require('./app/logo.png'),
+  },
   OperatorLogo: {
     OperatorLogo: require('./provider-logo/Default.png'),
     TelkomselLogo: require('./provider-logo/Telkomsel.png'),
