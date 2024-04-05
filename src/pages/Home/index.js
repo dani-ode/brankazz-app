@@ -51,12 +51,14 @@ const HomeScreen = () => {
       }
 
       await user_profile(userId, userKey, userBearerToken).then(res => {
-        if (res.status === 200) {
-          setUser(res.data.data);
-          setLoading(false);
-        } else {
-          AsyncStorage.clear();
-          navigation.replace('Login');
+        if (res) {
+          if (res.status === 200) {
+            setUser(res.data.data);
+            setLoading(false);
+          } else {
+            AsyncStorage.clear();
+            navigation.replace('Login');
+          }
         }
       });
     } catch (error) {
@@ -94,6 +96,8 @@ const HomeScreen = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar />
       <ScrollView
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={isLoading} onRefresh={handleRefresh} />
         }>
@@ -129,9 +133,11 @@ const HomeScreen = () => {
                       color={theme['color-secondary-800']}
                     />
                     <TouchableOpacity
-                      onPress={() =>
-                        navigation.navigate('ExchangeSelectSeller')
-                      }>
+                      onPress={() => {
+                        if (user.status != 'active')
+                          Alert.alert('Your account is not active!');
+                        else navigation.navigate('ExchangeInputNumber');
+                      }}>
                       <Text style={styles.depositTitle}> Exchange</Text>
                     </TouchableOpacity>
                   </View>

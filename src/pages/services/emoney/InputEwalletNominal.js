@@ -69,11 +69,17 @@ const InputEwalletNominal = ({route, navigation}) => {
       console.log(userId, userKey, userBearerToken);
 
       await user_profile(userId, userKey, userBearerToken).then(res => {
-        if (res.status === 200) {
-          setUser(res.data.data);
-          // setLoading(false);
+        if (res) {
+          if (res.status === 200) {
+            setUser(res.data.data);
+            // setLoading(false);
 
-          setLoading(false);
+            setLoading(false);
+          }
+        } else {
+          Alert.alert('Error', res.data.message, [
+            {text: 'OK', onPress: () => navigation.goBack()},
+          ]);
         }
       });
     } catch (error) {
@@ -95,9 +101,15 @@ const InputEwalletNominal = ({route, navigation}) => {
         product_sku_code,
         brand,
       ).then(res => {
-        if (res.status === 200) {
-          //   console.log(res.data.data.name);
-          setUserWallet(res.data.data);
+        if (res) {
+          if (res.status === 200) {
+            //   console.log(res.data.data.name);
+            setUserWallet(res.data.data);
+          }
+        } else {
+          Alert.alert('Error', res.data.message, [
+            {text: 'OK', onPress: () => navigation.goBack()},
+          ]);
         }
       });
     } catch (error) {
@@ -185,31 +197,35 @@ const InputEwalletNominal = ({route, navigation}) => {
         amount,
       ).then(res => {
         // console.log(res.status);
-        if (res.status === 201) {
-          console.log(res.data.data);
+        if (res) {
+          if (res.status === 201) {
+            console.log(res.data.data);
 
-          // Extracting desired data
-          const admin_fee = res.data.data.digiflazz_data.admin;
-          const product_price = res.data.data.digiflazz_data.selling_price;
-          const ref_id = res.data.data.digiflazz_data.ref_id;
-          const signature = res.data.data.signature;
+            // Extracting desired data
+            const admin_fee = res.data.data.digiflazz_data.admin;
+            const product_price = res.data.data.digiflazz_data.selling_price;
+            const ref_id = res.data.data.digiflazz_data.ref_id;
+            const signature = res.data.data.signature;
 
-          // console.log(admin_fee, product_price, ref_id, signature);
+            // console.log(admin_fee, product_price, ref_id, signature);
 
-          setLoading(false);
-          navigation.replace('EwalletCheckOut', {
-            type,
-            user_balance,
-            category,
-            brand,
-            product_sku_code,
-            ref_id,
-            number,
-            name,
-            admin_fee,
-            product_price,
-            signature,
-          });
+            setLoading(false);
+            navigation.replace('EwalletCheckOut', {
+              type,
+              user_balance,
+              category,
+              brand,
+              product_sku_code,
+              ref_id,
+              number,
+              name,
+              admin_fee,
+              product_price,
+              signature,
+            });
+          }
+        } else {
+          Alert.alert('Error', res.data.message);
         }
       });
     } catch (error) {

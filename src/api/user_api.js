@@ -1,6 +1,7 @@
 import ApiManager from './ApiManager';
 
 import {BRANKAZZ_ACCESS_KEY} from '@env';
+import {BRANKAZZ_ADMIN_KEY} from '@env';
 
 const MAX_RETRIES = 3;
 const user_login = async (email, password) => {
@@ -50,6 +51,52 @@ const user_profile = async (userId, userKey, userBearerToken) => {
     console.error(error);
   }
 };
+const user_update_profile = async (
+  userId,
+  userKey,
+  userBearerToken,
+  userRole,
+  name,
+  email,
+  profileImg,
+) => {
+  try {
+    const config = {
+      headers: {
+        'Access-Key': BRANKAZZ_ACCESS_KEY,
+        'User-Key': userKey,
+        Authorization: `Bearer ${userBearerToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    };
+
+    const formData = new FormData();
+    if (userRole == 'admin') {
+      formData.append('admin_key', BRANKAZZ_ADMIN_KEY);
+    }
+    formData.append('name', name);
+    formData.append('email', email);
+    formData.append('profile_img', {
+      uri: profileImg,
+      type: 'image/jpeg',
+      name: userId + '_profile_image.jpg',
+    });
+
+    // const bodyParameters = {
+    //   name: name,
+    //   email: email,
+    //   profile_img: profileImage,
+    // };
+
+    console.log(userId, userKey, userBearerToken, formData);
+
+    const res = await ApiManager.post('/api/user/' + userId, formData, config);
+    // console.log(res);
+    return res;
+  } catch (error) {
+    console.error(error);
+  }
+};
 const user_logout = async (userKey, userBearerToken) => {
   try {
     const res = await ApiManager.get('/api/logout', {
@@ -94,4 +141,10 @@ const user_fcm_token = async (user_id, fcm_token, userKey, userBearerToken) => {
   }
 };
 
-export {user_login, user_profile, user_logout, user_fcm_token};
+export {
+  user_login,
+  user_profile,
+  user_update_profile,
+  user_logout,
+  user_fcm_token,
+};

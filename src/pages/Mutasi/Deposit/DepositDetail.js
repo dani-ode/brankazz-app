@@ -18,6 +18,7 @@ import Images from '../../../assets/images';
 import ViewShot from 'react-native-view-shot';
 
 import Share from 'react-native-share';
+import BankTransfer from './howToTransfer/BankTransfer';
 
 export default function DepositDetail({route}) {
   const {id} = route.params;
@@ -169,9 +170,11 @@ export default function DepositDetail({route}) {
                 <View style={styles.line} />
                 <View style={styles.depositInfo}>
                   <View style={styles.row}>
-                    <Text style={styles.label}>Harga</Text>
+                    <Text style={styles.label}>Nominal</Text>
                     <Text style={styles.value}>
-                      {formatCurrency(deposit.amount)}
+                      {deposit.status == 'pending'
+                        ? '-'
+                        : formatCurrency(deposit.amount)}
                     </Text>
                   </View>
                   <View style={styles.row}>
@@ -227,7 +230,7 @@ export default function DepositDetail({route}) {
                     <Text style={styles.value}>{deposit.receiver_name}</Text>
                   </View>
                   <View style={styles.row}>
-                    <Text style={styles.label}>Akun Pengirim</Text>
+                    <Text style={styles.label}>Akun Penerima</Text>
                     <Text style={styles.value}>
                       {deposit.receiver_account_number}
                     </Text>
@@ -245,6 +248,20 @@ export default function DepositDetail({route}) {
                 {/* <Text>{JSON.stringify(deposit)}</Text> */}
               </Card>
             </ViewShot>
+
+            <View
+              style={{
+                display: deposit.status == 'pending' ? 'flex' : 'none',
+                justifyContent: 'center',
+                marginTop: 20,
+              }}>
+              <Card style={styles.how_to_transfer}>
+                <Text style={styles.how_to_transfer_text}>
+                  Invoice #{deposit.message}
+                </Text>
+                <BankTransfer deposit={deposit} />
+              </Card>
+            </View>
           </Layout>
         </ScrollView>
       </View>
@@ -357,5 +374,14 @@ const styles = StyleSheet.create({
   bkvalue: {
     fontSize: 14,
     color: theme['color-dark-gray-100'],
+  },
+
+  how_to_transfer_text: {
+    fontSize: 13,
+    color: theme['color-dark-gray-500'],
+    textAlign: 'center',
+    backgroundColor: theme['color-dark-gray-200'],
+    padding: 3,
+    fontWeight: 'bold',
   },
 });

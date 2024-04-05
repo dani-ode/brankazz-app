@@ -22,23 +22,32 @@ export default function InputAccNumber({route, navigation}) {
       const userBearerToken = await AsyncStorage.getItem('bearer-token');
 
       await user_by_number(number, userKey, userBearerToken).then(res => {
-        if (res.status === 200) {
-          setPartner(res.data.data);
-          navigation.navigate('ServiceTransferCheckout', {
-            user_balance: user_balance,
-            category: category,
-            brand: brand,
-            type: type,
-            number: number,
-            partner_name: res.data.data.name,
-            amount_code: '01',
-            set_amount: '0',
-            set_description: '-',
-          });
+        // console.log('Response: ' + res);
+
+        if (res) {
+          if (res.status === 200) {
+            setPartner(res.data.data);
+            navigation.navigate('ServiceTransferCheckout', {
+              user_balance: user_balance,
+              category: category,
+              brand: brand,
+              type: type,
+              number: number,
+              partner_name: res.data.data.name,
+              amount_code: '01',
+              set_amount: '0',
+              set_description: '-',
+            });
+          }
+        } else {
+          Alert.alert(
+            'Terjadi kesalahan',
+            'Cek nomor tujuan Anda sebelum mencoba lagi',
+          );
         }
       });
     } catch (error) {
-      Alert.alert('Error', error.response);
+      // Alert.alert('Error', error.response);
       console.error(error);
     }
   };

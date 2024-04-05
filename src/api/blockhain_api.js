@@ -21,7 +21,7 @@ const user_by_number = async (number, userKey, userBearerToken) => {
 
     return res;
   } catch (error) {
-    console.error(error);
+    console.error('Error : ' + error);
   }
 };
 

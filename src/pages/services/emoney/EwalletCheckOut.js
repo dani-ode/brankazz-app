@@ -90,28 +90,34 @@ const EwalletCheckOut = ({route, navigation}) => {
         product_sku_code,
         brand_name,
       ).then(res => {
-        if (res.status === 200) {
-          // let string = 'NURDIN[id]323201372948[power]R1 /000001300';
-          let string = res.data.data.name;
+        if (res) {
+          if (res.status === 200) {
+            // let string = 'NURDIN[id]323201372948[power]R1 /000001300';
+            let string = res.data.data.name;
 
-          // Split the string based on the delimiters
-          let parts = string.split(/\[|\]/);
+            // Split the string based on the delimiters
+            let parts = string.split(/\[|\]/);
 
-          // Extract the values and assign them to variables
-          let name = parts[0];
-          let id = parts[2];
-          let power = parts[4];
+            // Extract the values and assign them to variables
+            let name = parts[0];
+            let id = parts[2];
+            let power = parts[4];
 
-          console.log('name =', name);
-          console.log('id =', id);
-          console.log('power =', power);
+            console.log('name =', name);
+            console.log('id =', id);
+            console.log('power =', power);
 
-          setMeterName(name);
-          setMeterId(id);
-          setMeterPower(power);
+            setMeterName(name);
+            setMeterId(id);
+            setMeterPower(power);
 
-          console.log(res.data.data);
-          setMeterDetail(res.data.data);
+            console.log(res.data.data);
+            setMeterDetail(res.data.data);
+          }
+        } else {
+          Alert.alert('Error', res.data.message, [
+            {text: 'OK', onPress: () => navigation.goBack()},
+          ]);
         }
       });
     } catch (error) {

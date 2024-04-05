@@ -30,7 +30,7 @@ const ProfileScreen = ({navigation}) => {
     getUser();
     const interval = setInterval(() => {
       getUser();
-    }, 15000);
+    }, 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -58,11 +58,14 @@ const ProfileScreen = ({navigation}) => {
       }
 
       await user_profile(userId, userKey, userBearerToken).then(res => {
-        if (res.status === 200) {
-          setUser(res.data.data);
-          setLoading(false);
-        } else {
-          handleLogout();
+        if (res) {
+          if (res.status === 200) {
+            setUser(res.data.data);
+            // console.log(res.data.data);
+            setLoading(false);
+          } else {
+            handleLogout();
+          }
         }
       });
     } catch (error) {
@@ -120,6 +123,12 @@ const ProfileScreen = ({navigation}) => {
     const accountNumberStr = String(accountNumber);
     const accountNameStr = String(accountName);
 
+    let accountNumberLengthStr = String(accountNumberStr.length);
+
+    if (accountNumberStr.length < 10) {
+      accountNumberLengthStr = '0' + accountNumberLengthStr;
+    }
+
     let accountNameLengthStr = String(accountNameStr.length);
     if (accountNameStr.length < 10) {
       accountNameLengthStr = '0' + accountNameLengthStr;
@@ -130,7 +139,7 @@ const ProfileScreen = ({navigation}) => {
       descriptionLengthStr = '0' + descriptionLengthStr;
     }
 
-    const qrValue = `${standard}${typeStr}${amountLengthStr}${amountStr}${accountNumberStr.length}${accountNumberStr}${accountNameLengthStr}${accountNameStr}${descriptionLengthStr}${description}`;
+    const qrValue = `${standard}${typeStr}${amountLengthStr}${amountStr}${accountNumberLengthStr}${accountNumberStr}${accountNameLengthStr}${accountNameStr}${descriptionLengthStr}${description}`;
 
     console.log(qrValue);
     return qrValue;
@@ -140,15 +149,15 @@ const ProfileScreen = ({navigation}) => {
     {
       id: 1,
       image: 'https://img.icons8.com/color/70/000000/administrator-male.png',
-      title: 'Update Akun',
-      code: 'update',
+      title: 'Edit Akun',
+      code: 'EditProfile',
       url: '',
     },
     {
       id: 2,
       image: 'https://img.icons8.com/color/70/000000/cottage.png',
       title: 'Bahasa',
-      code: 'language',
+      code: 'SelectLanguage',
       url: '',
     },
     {
@@ -217,7 +226,7 @@ const ProfileScreen = ({navigation}) => {
         // Alert.alert(item.url);
         Linking.openURL(item.url);
       } else {
-        Alert.alert(item.code);
+        navigation.navigate(item.code);
       }
     }
   };
@@ -246,13 +255,21 @@ const ProfileScreen = ({navigation}) => {
     return (
       <View style={styles.headerContent}>
         <View style={{position: 'relative'}}>
-          <Image
-            style={styles.avatar}
-            source={{
-              uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Windows_10_Default_Profile_Picture.svg/512px-Windows_10_Default_Profile_Picture.svg.png',
-              // uri: 'https://bootdey.com/img/Content/avatar/avatar7.png',
-            }}
-          />
+          {user.profile_img ? (
+            <Image
+              style={styles.avatar}
+              source={{
+                uri: user.profile_img,
+              }}
+            />
+          ) : (
+            <Image
+              style={styles.avatar}
+              source={{
+                uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Windows_10_Default_Profile_Picture.svg/512px-Windows_10_Default_Profile_Picture.svg.png',
+              }}
+            />
+          )}
           <View style={styles.imageOverlay} />
         </View>
 
@@ -269,7 +286,11 @@ const ProfileScreen = ({navigation}) => {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.row}>
+        <View
+          style={[
+            styles.row,
+            {display: user.account_number == 'NaN' ? 'none' : 'flex'},
+          ]}>
           <TouchableOpacity onPress={() => setQratonModal(true)}>
             <Text style={styles.btnQrGenerator}>
               <MaterialCommunityIcons
@@ -312,6 +333,32 @@ const ProfileScreen = ({navigation}) => {
           </View> */}
 
         <View style={styles.body}>
+          <View
+            style={[
+              styles.sectionBox,
+              {
+                display:
+                  user.email_verified_at == null || user.status == 'muted'
+                    ? 'flex'
+                    : 'none',
+              },
+            ]}>
+            <Text
+              style={[
+                styles.sectionTitle,
+                {display: user.email_verified_at == null ? 'flex' : 'none'},
+              ]}>
+              - Email Anda ({user.email}) belum di verifikasi!
+            </Text>
+            <Text
+              style={[
+                styles.sectionTitle,
+                {display: user.status == 'muted' ? 'flex' : 'none'},
+              ]}>
+              - Akun Anda sedang di review! (1-2 hari kerja), Untuk percepatan
+              hubungi admin (085220838947)
+            </Text>
+          </View>
           <FlatList
             enableEmptySections={true}
             data={options}
@@ -378,7 +425,7 @@ const ProfileScreen = ({navigation}) => {
                 style={[styles.input, {paddingHorizontal: 20}]}
                 placeholder="Nominal"
                 // autoFocus={true}
-                value={qratonAmount}
+                value={qratonAmount.toString()}
                 placeholderTextColor={theme['color-primary-500']}
                 onChangeText={qratonAmount => handleInputChange(qratonAmount)}
                 maxLength={20}
@@ -440,6 +487,21 @@ const styles = StyleSheet.create({
     backgroundColor: theme['color-dark-gray-200'],
   },
 
+  sectionBox: {
+    margin: 20,
+    padding: 20,
+    backgroundColor: theme['color-secondary-200'],
+    borderRadius: 15,
+  },
+
+  sectionTitle: {
+    color: theme['color-secondary-700'],
+    fontSize: 12,
+    // justifyContent: 'center',
+    // alignItems: 'center',
+    // textAlign: 'center',
+  },
+
   row: {
     flexDirection: 'row',
   },
@@ -466,8 +528,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme['color-secondary-600'],
     marginBottom: 10,
-    backgroundColor: theme['color-primary-700'],
-    opacity: 0.4,
+    // backgroundColor: theme['color-primary-700'],
+    // opacity: 0.4,
   },
   icon: {
     width: 40,

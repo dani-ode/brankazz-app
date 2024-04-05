@@ -37,6 +37,8 @@ import BankList from '../pages/services/bank/BankList';
 import DepositDetail from '../pages/Mutasi/Deposit/DepositDetail';
 import InputDepositNominal from '../pages/Exchange/InputDepositNominal';
 import EwalletCheckOut from '../pages/services/emoney/EwalletCheckOut';
+import EditProfile from '../pages/Profile/EditProfile';
+import SelectLanguage from '../pages/Profile/SelectLanguage';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -223,6 +225,21 @@ export class Routes extends Component {
             name="Pages"
             component={Pages}
             options={{headerShown: false}}
+          />
+
+          {/* Pages */}
+
+          {/* Page - Profile */}
+
+          <Stack.Screen
+            name="EditProfile"
+            component={EditProfile}
+            options={{title: 'Edit Akun'}}
+          />
+          <Stack.Screen
+            name="SelectLanguage"
+            component={SelectLanguage}
+            options={{title: 'Pilih Bahasa'}}
           />
 
           {/* Exchange */}

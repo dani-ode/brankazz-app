@@ -91,19 +91,29 @@ const InputEwalletNumber = ({route}) => {
         product_sku_code,
         brand,
       ).then(res => {
-        if (res.status === 200) {
-          console.log(res.data.data.name);
-          setUser(res.data.data);
-          navigation.navigate('ServiceEwalletInputNominal', {
-            user_balance: user_balance,
-            category: category,
-            brand: brand,
-            number: number,
-            name: res.data.data.name,
-            code: code,
-            relativeCode: relativeCode,
-            checkUserCode: checkUserCode,
-          });
+        if (res) {
+          if (res.status === 404) {
+            Alert.alert('Error', res.data.message);
+            return;
+          }
+          if (res.status === 200) {
+            console.log(res.data.data.name);
+            setUser(res.data.data);
+            navigation.navigate('ServiceEwalletInputNominal', {
+              user_balance: user_balance,
+              category: category,
+              brand: brand,
+              number: number,
+              name: res.data.data.name,
+              code: code,
+              relativeCode: relativeCode,
+              checkUserCode: checkUserCode,
+            });
+          }
+        } else {
+          Alert.alert('Error', res.data.message, [
+            {text: 'OK', onPress: () => navigation.goBack()},
+          ]);
         }
       });
     } catch (error) {

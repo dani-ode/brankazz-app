@@ -21,6 +21,7 @@ import {default as theme} from '../../../../theme.json';
 import {Card} from '@ui-kitten/components';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Bounce} from 'react-native-animated-spinkit';
+import CheckBox from '@react-native-community/checkbox';
 
 const Register = props => {
   const [userName, setUserName] = useState('');
@@ -31,7 +32,9 @@ const Register = props => {
   const [userPassword, setUserPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errortext, setErrortext] = useState('');
-  const [isRegistraionSuccess, setIsRegistraionSuccess] = useState(true);
+  const [isRegistraionSuccess, setIsRegistraionSuccess] = useState(false);
+
+  const [checked, setChecked] = useState(false);
 
   const emailInputRef = createRef();
   const phoneInputRef = createRef();
@@ -40,6 +43,11 @@ const Register = props => {
   const passwordInputRef = createRef();
 
   const handleSubmitButton = () => {
+    if (!checked) {
+      alert('Please agree with our terms and conditions');
+      return;
+    }
+
     setErrortext('');
     if (!userName) {
       alert('Please fill Name');
@@ -129,12 +137,15 @@ const Register = props => {
         /> */}
         <Text style={styles.successTextStyle}>Pendaftaran Berhasil</Text>
         <Text style={styles.successDescriptionStyle}>
-          Cek email anda untuk verifikasi, lalu login
+          Cek email anda ({userEmail}) untuk verifikasi, lalu login
         </Text>
         <TouchableOpacity
           style={styles.buttonGoBackStyle}
           activeOpacity={0.5}
-          onPress={() => props.navigation.navigate('Login')}>
+          onPress={() => {
+            // setIsRegistraionSuccess(false);
+            props.navigation.navigate('Login');
+          }}>
           <Text style={styles.buttonTextStyle}>Kembali ke Login</Text>
         </TouchableOpacity>
       </View>
@@ -264,6 +275,43 @@ const Register = props => {
               {errortext != '' ? (
                 <Text style={styles.errorTextStyle}>{errortext}</Text>
               ) : null}
+
+              <View style={styles.checkboxContainer}>
+                <View style={styles.row}>
+                  <CheckBox
+                    disabled={false}
+                    value={checked}
+                    style={styles.checkbox}
+                    tintColors={{
+                      true: theme['color-secondary-800'],
+                      false: theme['color-secondary-800'],
+                    }}
+                    onValueChange={newValue => {
+                      setChecked(newValue);
+                    }}
+                  />
+                  <Text style={styles.checkboxText}>
+                    Saya menyetujui (
+                    <TouchableOpacity
+                      style={styles.termsText}
+                      onPress={() => {
+                        Linking.openURL('https://brankazz.corpo.id/terms');
+                      }}>
+                      <Text
+                        style={{
+                          color: theme['color-secondary-800'],
+                          marginBottom: -4,
+                          textDecorationLine: 'underline',
+                          fontSize: 12,
+                        }}>
+                        Syarat dan ketentuan
+                      </Text>
+                    </TouchableOpacity>
+                    )
+                  </Text>
+                </View>
+              </View>
+
               <TouchableOpacity
                 style={styles.buttonStyle}
                 activeOpacity={0.5}
@@ -360,5 +408,25 @@ const styles = StyleSheet.create({
     color: theme['color-primary-400'],
     textAlign: 'center',
     fontSize: 15,
+  },
+
+  checkboxContainer: {
+    marginVertical: 10,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  checkboxText: {
+    color: theme['color-primary-100'],
+    fontSize: 12,
+    marginLeft: 5,
+
+    marginLeft: -2,
+  },
+
+  termsText: {
+    // marginBottom: 100,
   },
 });

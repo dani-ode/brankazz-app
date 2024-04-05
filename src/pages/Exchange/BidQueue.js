@@ -24,11 +24,14 @@ const BidQueue = ({navigation, route}) => {
     getPartnerBillings();
   }, []);
 
-  const [tableHead, setTableHead] = useState([
-    'Tanggal',
-    'ID Transaksi',
-    'Status',
-  ]);
+  const [tableHead, setTableHead] = useState(['Tanggal', 'Nominal', 'Status']);
+
+  function formatCurrency(amount) {
+    amount = Number(amount)
+      .toFixed(0)
+      .replace(/(\d)(?=(\d{3})+\b)/g, '$1.');
+    return amount;
+  }
 
   const getBidList = async () => {
     const userKey = await AsyncStorage.getItem('user-key');
@@ -40,7 +43,11 @@ const BidQueue = ({navigation, route}) => {
           const bid_list = res.data.data;
 
           setBids(
-            bid_list.map(item => [item.date, item.order_id, item.status]),
+            bid_list.map(item => [
+              item.date,
+              formatCurrency(item.amount),
+              item.status,
+            ]),
           );
           console.log(bid_list);
           // setLoading(false);

@@ -56,11 +56,17 @@ const CheckOut = ({route, navigation}) => {
       console.log(userId, userKey, userBearerToken);
 
       await user_profile(userId, userKey, userBearerToken).then(res => {
-        if (res.status === 200) {
-          setUser(res.data.data);
-          // setLoading(false);
+        if (res) {
+          if (res.status === 200) {
+            setUser(res.data.data);
+            // setLoading(false);
 
-          setLoading(false);
+            setLoading(false);
+          } else {
+            Alert.alert('Error', res.data.message, [
+              {text: 'OK', onPress: () => navigation.goBack()},
+            ]);
+          }
         }
       });
     } catch (error) {

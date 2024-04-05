@@ -67,11 +67,17 @@ const CheckoutKmp = ({route, navigation}) => {
       console.log(userId, userKey, userBearerToken);
 
       await user_profile(userId, userKey, userBearerToken).then(res => {
-        if (res.status === 200) {
-          setUser(res.data.data);
-          // setLoading(false);
+        if (res) {
+          if (res.status === 200) {
+            setUser(res.data.data);
+            // setLoading(false);
 
-          setLoading(false);
+            setLoading(false);
+          }
+        } else {
+          Alert.alert('Error', res.data.message, [
+            {text: 'OK', onPress: () => navigation.goBack()},
+          ]);
         }
       });
     } catch (error) {
@@ -144,12 +150,17 @@ const CheckoutKmp = ({route, navigation}) => {
         new_description,
       ).then(res => {
         // console.log(res.status);
-        if (res.status === 201) {
-          console.log(res.data.data);
-          console.log('Transaction ID' + res.data.data.id);
+        if (res) {
+          if (res.status === 201) {
+            console.log(res.data.data);
+            console.log('Transaction ID' + res.data.data.id);
 
+            setLoading(false);
+            navigation.replace('TransactionDetail', {id: res.data.data.id});
+          }
+        } else {
+          Alert.alert('Error', 'Terjadi kesalahan, silahkan coba lagi');
           setLoading(false);
-          navigation.replace('TransactionDetail', {id: res.data.data.id});
         }
       });
     } catch (error) {

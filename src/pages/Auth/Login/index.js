@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Alert,
   Button,
   KeyboardAvoidingView,
   SafeAreaView,
@@ -84,39 +85,42 @@ class Login extends React.Component {
 
       if (enabled) {
         await user_login(email, password).then(res => {
-          if (res.status === 200) {
-            console.log('stroed user');
+          console.log(res);
+          if (res) {
+            if (res.status === 200) {
+              console.log('stroed user');
 
-            const userId = res.data.data.id;
-            const userKey = res.data.data.key;
-            const userBearerToken = res.data.data.token;
+              const userId = res.data.data.id;
+              const userKey = res.data.data.key;
+              const userBearerToken = res.data.data.token;
 
-            AsyncStorage.setItem('user-id', JSON.stringify(userId));
-            AsyncStorage.setItem('user-key', userKey);
-            AsyncStorage.setItem('bearer-token', userBearerToken);
-            // console.log(res.data.data);
+              AsyncStorage.setItem('user-id', JSON.stringify(userId));
+              AsyncStorage.setItem('user-key', userKey);
+              AsyncStorage.setItem('bearer-token', userBearerToken);
+              // console.log(res.data.data);
 
-            // set user personal FCM Token
-            messaging()
-              .getToken()
-              .then(token => {
-                user_fcm_token(userId, token, userKey, userBearerToken).then(
-                  res => {
-                    // console.log(res.status);
-                    if (res.status === 201) {
-                      console.log('stored fcm token');
-                    }
-                  },
-                );
-                console.log('FCM Token: ' + token);
-              });
+              // set user personal FCM Token
+              messaging()
+                .getToken()
+                .then(token => {
+                  user_fcm_token(userId, token, userKey, userBearerToken).then(
+                    res => {
+                      // console.log(res.status);
+                      if (res.status === 201) {
+                        console.log('stored fcm token');
+                      }
+                    },
+                  );
+                  console.log('FCM Token: ' + token);
+                });
 
-            console.log('logged in');
-            this.props.navigation.dispatch(StackActions.replace('Pages'));
-          } else {
-            this.setState({isLoading: false});
-            console.log('failed to login');
-            this.setState({isLoading: false});
+              console.log('logged in');
+              this.props.navigation.dispatch(StackActions.replace('Pages'));
+            } else {
+              Alert.alert('Login Gagal', 'Email atau Password Anda salah');
+              console.log('failed to login');
+              this.setState({isLoading: false});
+            }
           }
         });
 
@@ -127,6 +131,7 @@ class Login extends React.Component {
         this.onDisplayNotification();
       }
     } catch (error) {
+      Alert.alert('Error', error.response);
       console.log('failed to login');
       this.setState({isLoading: false});
       console.error(error);

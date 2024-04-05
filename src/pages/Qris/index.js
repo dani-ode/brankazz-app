@@ -29,7 +29,7 @@ const QrisScreen = ({navigation}) => {
     const interval = setInterval(() => {
       getUser();
       setScanned(false);
-    }, 5000);
+    }, 6000);
     return () => clearInterval(interval);
   }, []);
 
@@ -74,7 +74,7 @@ const QrisScreen = ({navigation}) => {
           // Format the number with commas
           formattedAmount = formattedAmount.replace(
             /\B(?=(\d{3})+(?!\d))/g,
-            ',',
+            '.',
           );
 
           navigation.navigate('ServiceTransferCheckout', {
@@ -251,15 +251,35 @@ const QrisScreen = ({navigation}) => {
   };
 
   if (!cameraDevice) {
-    // requestCameraPermission();
+    requestCameraPermission();
     return (
       // <Layout>
       <>
-        <Text style={{textAlign: 'center', marginTop: 20}}>Loading...</Text>
-        <Text style={{textAlign: 'center', margin: 20}}>
-          Brankazz memerlukan izin Anda untuk menggunakan kamera. Silakan
-          izinkan di pengaturan Anda, atau pada menu pop-up.
-        </Text>
+        <View
+          style={{
+            flex: 1,
+            // justifyContent: 'center',
+            // alignItems: 'center',
+            backgroundColor: theme['color-dark-500'],
+          }}>
+          <Text
+            style={{
+              textAlign: 'center',
+              marginTop: 20,
+              color: theme['color-primary-500'],
+            }}>
+            Loading...
+          </Text>
+          <Text
+            style={{
+              textAlign: 'center',
+              margin: 20,
+              color: theme['color-primary-500'],
+            }}>
+            Brankazz memerlukan izin Anda untuk menggunakan kamera. Silakan
+            izinkan di pengaturan Anda, atau pada menu pop-up.
+          </Text>
+        </View>
       </>
       // </Layout>
     );

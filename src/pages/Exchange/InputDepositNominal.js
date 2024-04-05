@@ -167,7 +167,9 @@ const InputDepositNominal = ({route, navigation}) => {
   };
 
   function formatCurrency(amount) {
-    amount = amount.toFixed(0).replace(/(\d)(?=(\d{3})+\b)/g, '$1.');
+    amount = Number(amount)
+      .toFixed(0)
+      .replace(/(\d)(?=(\d{3})+\b)/g, '$1.');
     return amount;
   }
 
@@ -350,6 +352,7 @@ const styles = StyleSheet.create({
     zIndex: 100,
 
     fontWeight: 'bold',
+    color: theme['color-dark-500'],
     borderRadius: 10,
   },
   inputDescription: {
