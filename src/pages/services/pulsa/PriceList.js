@@ -26,8 +26,15 @@ import {default as theme} from '../../../../theme.json';
 // };
 
 const PriceList = ({route, navigation}) => {
-  const {number, category, brand, product_sku_code_type, type, user_balance} =
-    route.params;
+  const {
+    number,
+    category,
+    brand,
+    product_sku_code_type,
+    type,
+    user_balance,
+    ewalet_check_user_code,
+  } = route.params;
 
   console.log(
     number,
@@ -36,6 +43,7 @@ const PriceList = ({route, navigation}) => {
     product_sku_code_type,
     type,
     user_balance,
+    ewalet_check_user_code,
   );
 
   const [products, setProducts] = useState([]);
@@ -59,6 +67,7 @@ const PriceList = ({route, navigation}) => {
       type,
       product_price,
       user_balance,
+      ewalet_check_user_code,
     });
   };
 

@@ -30,6 +30,8 @@ const EwalletCheckOut = ({route, navigation}) => {
     signature,
   } = route.params;
 
+  console.log('category = ' + category, 'brand = ' + brand);
+
   const [user, setUser] = useState([['-', '-', '-']]);
 
   const [isLoading, setLoading] = useState(true);
@@ -216,6 +218,10 @@ const EwalletCheckOut = ({route, navigation}) => {
   //   ['a', 'b'],
   // ]);
 
+  function replaceXWithAsterisk(name) {
+    return name.replace(/X/g, '*');
+  }
+
   const PlnUserDetail = () => {
     if (meterId == '0') {
       return null;
@@ -284,12 +290,14 @@ const EwalletCheckOut = ({route, navigation}) => {
                 <Text style={styles.text}>Nama </Text>
               </View>
               <View style={styles.col}>
-                <Text style={styles.textValue}>{name ?? '-'}</Text>
+                <Text style={styles.textValue}>
+                  {name != null ? replaceXWithAsterisk(name) : '-'}
+                </Text>
               </View>
             </View>
             <View style={styles.row}>
               <View style={styles.col}>
-                <Text style={styles.text}>Kategori </Text>
+                <Text style={styles.text}>Kategori</Text>
               </View>
               <View style={styles.col}>
                 <Text style={styles.textValue}>

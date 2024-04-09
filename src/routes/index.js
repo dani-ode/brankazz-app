@@ -325,6 +325,7 @@ export class Routes extends Component {
               product_sku_code_type: '',
               type: '',
               user_balance: '',
+              ewalet_check_user_code: '',
             }}
           />
           <Stack.Screen
@@ -339,6 +340,7 @@ export class Routes extends Component {
               type: '',
               product_price: '',
               user_balance: '',
+              ewalet_check_user_code: '',
             }}
           />
 

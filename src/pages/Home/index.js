@@ -136,7 +136,7 @@ const HomeScreen = () => {
                       onPress={() => {
                         if (user.status != 'active')
                           Alert.alert('Your account is not active!');
-                        else navigation.navigate('ExchangeInputNumber');
+                        else navigation.navigate('ExchangeSelectSeller');
                       }}>
                       <Text style={styles.depositTitle}> Exchange</Text>
                     </TouchableOpacity>

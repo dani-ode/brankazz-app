@@ -13,7 +13,7 @@ import {default as theme} from '../../../../theme.json';
 // import {Table, Row, Rows} from 'react-native-table-component';
 import {user_profile} from '../../../api/user_api';
 
-import {Bounce} from 'react-native-animated-spinkit';
+import {Bounce, Wave} from 'react-native-animated-spinkit';
 
 const CheckOut = ({route, navigation}) => {
   const {
@@ -24,11 +24,19 @@ const CheckOut = ({route, navigation}) => {
     type,
     product_price,
     user_balance,
+    ewalet_check_user_code,
   } = route.params;
+
+  console.log(
+    'category = ' + category,
+    'brand = ' + brand,
+    'code = ' + ewalet_check_user_code,
+  );
 
   const [user, setUser] = useState([['-', '-', '-']]);
 
   const [isLoading, setLoading] = useState(true);
+  const [userWallet, setUserWallet] = useState({});
 
   const [meterDetail, setMeterDetail] = useState({});
   const [meterName, setMeterName] = useState('naN');
@@ -42,7 +50,15 @@ const CheckOut = ({route, navigation}) => {
       getMeterDetail();
       const interval = setInterval(() => {
         getMeterDetail();
-      }, 2500);
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+
+    if (ewalet_check_user_code) {
+      getUserWallet();
+      const interval = setInterval(() => {
+        getUserWallet();
+      }, 5000);
       return () => clearInterval(interval);
     }
   }, []);
@@ -114,6 +130,37 @@ const CheckOut = ({route, navigation}) => {
 
           console.log(res.data.data);
           setMeterDetail(res.data.data);
+        }
+      });
+    } catch (error) {
+      Alert.alert('Error', error.response);
+      console.error(error);
+    }
+  };
+
+  const getUserWallet = async () => {
+    try {
+      const userKey = await AsyncStorage.getItem('user-key');
+      const userBearerToken = await AsyncStorage.getItem('bearer-token');
+
+      const product_sku_code = ewalet_check_user_code;
+
+      await account_ref(
+        userKey,
+        userBearerToken,
+        number,
+        product_sku_code,
+        brand,
+      ).then(res => {
+        if (res) {
+          if (res.status === 200) {
+            //   console.log(res.data.data.name);
+            setUserWallet(res.data.data);
+          }
+        } else {
+          Alert.alert('Error', res.data.message, [
+            {text: 'OK', onPress: () => navigation.goBack()},
+          ]);
         }
       });
     } catch (error) {
@@ -200,6 +247,10 @@ const CheckOut = ({route, navigation}) => {
     return amount;
   }
 
+  function replaceXWithAsterisk(name) {
+    return name.replace(/X/g, '*');
+  }
+
   // const [tableHead, setTableHead] = useState(['Head', 'Head2']);
   // const [tableData, setTableData] = useState([
   //   ['1', '2'],
@@ -270,10 +321,28 @@ const CheckOut = ({route, navigation}) => {
                 <Text style={styles.textValue}>{number}</Text>
               </View>
             </View>
+            {ewalet_check_user_code ? (
+              <View style={styles.row}>
+                <View style={styles.col}>
+                  <Text style={styles.text}>Nama </Text>
+                </View>
+                <View style={styles.col}>
+                  <Text style={styles.textValue}>
+                    {userWallet.name ? (
+                      replaceXWithAsterisk(userWallet.name)
+                    ) : !ewalet_check_user_code ? (
+                      'tanpa cek nama'
+                    ) : (
+                      <Wave size={16} color={theme['color-primary-600']} />
+                    )}
+                  </Text>
+                </View>
+              </View>
+            ) : null}
             <PlnUserDetail />
             <View style={styles.row}>
               <View style={styles.col}>
-                <Text style={styles.text}>Category </Text>
+                <Text style={styles.text}>Kategory </Text>
               </View>
               <View style={styles.col}>
                 <Text style={styles.textValue}>{category}</Text>

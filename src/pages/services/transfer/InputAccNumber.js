@@ -16,36 +16,91 @@ export default function InputAccNumber({route, navigation}) {
   brand = 'kampua';
   type = 'transfer';
 
+  function generateChecksum(accountNumber) {
+    // Remove spaces and dashes from the account number
+    accountNumber = accountNumber.replace(/ |-/g, '');
+
+    // Calculate the checksum using the Luhn algorithm
+    let checksum = 0;
+    let length = accountNumber.length;
+    let parity = length % 2;
+    for (let i = 0; i < length; i++) {
+      let digit = parseInt(accountNumber[i]);
+      if (i % 2 === parity) {
+        digit *= 2;
+        if (digit > 9) {
+          digit -= 9;
+        }
+      }
+      checksum += digit;
+    }
+    checksum %= 10;
+    if (checksum !== 0) {
+      checksum = 10 - checksum;
+    }
+
+    return checksum;
+  }
+
+  function validateNumber(accountNumber) {
+    // Remove spaces and dashes from the account number
+    accountNumber = accountNumber.replace(/ |-/g, '');
+
+    // Extract the checksum from the account number
+    let checksum = parseInt(accountNumber.slice(-1));
+
+    // Remove the checksum from the account number
+    let accountNumberWithoutChecksum = accountNumber.slice(0, -1);
+
+    // Calculate the checksum using the Luhn algorithm
+    let checksumCalculated = generateChecksum(accountNumberWithoutChecksum);
+
+    // Validate the checksum
+    return checksum === checksumCalculated;
+  }
+
   const getPartner = async ({user_balance, category, brand, type, number}) => {
     try {
+      if (!validateNumber(number)) {
+        Alert.alert(
+          'Terjadi kesalahan',
+          'Cek nomor tujuan Anda sebelum mencoba lagi',
+        );
+        return;
+      }
+
       const userKey = await AsyncStorage.getItem('user-key');
       const userBearerToken = await AsyncStorage.getItem('bearer-token');
 
-      await user_by_number(number, userKey, userBearerToken).then(res => {
-        // console.log('Response: ' + res);
+      await user_by_number(number, userKey, userBearerToken)
+        .then(res => {
+          // console.log('Response: ' + res);
 
-        if (res) {
-          if (res.status === 200) {
-            setPartner(res.data.data);
-            navigation.navigate('ServiceTransferCheckout', {
-              user_balance: user_balance,
-              category: category,
-              brand: brand,
-              type: type,
-              number: number,
-              partner_name: res.data.data.name,
-              amount_code: '01',
-              set_amount: '0',
-              set_description: '-',
-            });
+          if (res) {
+            if (res.status === 200) {
+              setPartner(res.data.data);
+              navigation.navigate('ServiceTransferCheckout', {
+                user_balance: user_balance,
+                category: category,
+                brand: brand,
+                type: type,
+                number: number,
+                partner_name: res.data.data.name,
+                amount_code: '01',
+                set_amount: '0',
+                set_description: '-',
+              });
+            }
+          } else {
+            Alert.alert(
+              'Terjadi kesalahan',
+              'Cek nomor tujuan Anda sebelum mencoba lagi',
+            );
           }
-        } else {
-          Alert.alert(
-            'Terjadi kesalahan',
-            'Cek nomor tujuan Anda sebelum mencoba lagi',
-          );
-        }
-      });
+        })
+        .catch(error => {
+          console.error(error);
+        });
     } catch (error) {
       // Alert.alert('Error', error.response);
       console.error(error);

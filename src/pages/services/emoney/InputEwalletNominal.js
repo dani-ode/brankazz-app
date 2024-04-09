@@ -252,6 +252,7 @@ const InputEwalletNominal = ({route, navigation}) => {
       product_sku_code_type: by_type,
       type: type,
       user_balance: user_balance,
+      ewalet_check_user_code: checkUserCode,
     });
   };
 
@@ -297,6 +298,10 @@ const InputEwalletNominal = ({route, navigation}) => {
     return result;
   }
 
+  function replaceXWithAsterisk(name) {
+    return name.replace(/X/g, '*');
+  }
+
   return (
     <>
       <SafeAreaView style={styles.container}>
@@ -340,7 +345,7 @@ const InputEwalletNominal = ({route, navigation}) => {
               <View style={styles.col}>
                 <Text style={styles.textValue}>
                   {userWallet.name ? (
-                    userWallet.name
+                    replaceXWithAsterisk(userWallet.name)
                   ) : !checkUserCode ? (
                     'tanpa cek nama'
                   ) : (
