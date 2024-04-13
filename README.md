@@ -37,7 +37,6 @@ This project is licensed under the MIT License - see the LICENSE.md file for det
 ## Acknowledgements
 
 - React Native
-- Expo
 - [React Navigation](https://reactnavigation.org/)
 - [Axios](https://github.com/axios/axios)
 
