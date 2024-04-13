@@ -32,7 +32,7 @@ const deposit_create = async (
 
     console.log(bodyParameters);
 
-    const res = await ApiManager.post('/api/deposit', bodyParameters, config);
+    const res = await ApiManager.post('deposit', bodyParameters, config);
     return res;
   } catch (error) {
     console.error(error);
@@ -40,7 +40,7 @@ const deposit_create = async (
 };
 const deposit_show = async (id, userKey, userBearerToken) => {
   try {
-    const res = await ApiManager.get('/api/deposit/' + id, {
+    const res = await ApiManager.get('deposit/' + id, {
       headers: {
         'Content-Type': 'application/json',
         'Access-Key': BRANKAZZ_ACCESS_KEY,

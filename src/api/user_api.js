@@ -10,7 +10,7 @@ const user_login = async (email, password) => {
   while (retries < MAX_RETRIES) {
     try {
       console.log(email, password);
-      const res = await ApiManager.get('/api/login', {
+      const res = await ApiManager.get('login', {
         headers: {
           'Access-Key': BRANKAZZ_ACCESS_KEY,
         },
@@ -37,7 +37,7 @@ const user_login = async (email, password) => {
 
 const user_profile = async (userId, userKey, userBearerToken) => {
   try {
-    const res = await ApiManager.get('/api/user/' + userId, {
+    const res = await ApiManager.get('user/' + userId, {
       headers: {
         'Content-Type': 'application/json',
         'Access-Key': BRANKAZZ_ACCESS_KEY,
@@ -90,7 +90,7 @@ const user_update_profile = async (
 
     console.log(userId, userKey, userBearerToken, formData);
 
-    const res = await ApiManager.post('/api/user/' + userId, formData, config);
+    const res = await ApiManager.post('user/' + userId, formData, config);
     // console.log(res);
     return res;
   } catch (error) {
@@ -99,7 +99,7 @@ const user_update_profile = async (
 };
 const user_logout = async (userKey, userBearerToken) => {
   try {
-    const res = await ApiManager.get('/api/logout', {
+    const res = await ApiManager.get('logout', {
       headers: {
         'Content-Type': 'application/json',
         'Access-Key': BRANKAZZ_ACCESS_KEY,
@@ -131,7 +131,7 @@ const user_fcm_token = async (user_id, fcm_token, userKey, userBearerToken) => {
     console.log(bodyParameters);
 
     const res = await ApiManager.post(
-      '/api/create-personal-fcm-token',
+      'create-personal-fcm-token',
       bodyParameters,
       config,
     );

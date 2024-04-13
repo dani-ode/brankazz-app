@@ -10,7 +10,7 @@ const transaction_price_list = async (
   userBearerToken,
 ) => {
   try {
-    const res = await ApiManager.get('/api/transaction/price-list', {
+    const res = await ApiManager.get('transaction/price-list', {
       headers: {
         'Content-Type': 'application/json',
         'Access-Key': BRANKAZZ_ACCESS_KEY,
@@ -69,11 +69,7 @@ const transaction_create = async (
 
     // return;
 
-    const res = await ApiManager.post(
-      '/api/transaction',
-      bodyParameters,
-      config,
-    );
+    const res = await ApiManager.post('transaction', bodyParameters, config);
     return res;
   } catch (error) {
     console.error(error);
@@ -106,7 +102,7 @@ const postpaid_inquiry = async (
     // return;
 
     const res = await ApiManager.post(
-      '/api/transaction-inquiry',
+      'transaction-inquiry',
       bodyParameters,
       config,
     );
@@ -117,7 +113,7 @@ const postpaid_inquiry = async (
 };
 const transaction_show = async (id, userKey, userBearerToken) => {
   try {
-    const res = await ApiManager.get('/api/transaction/' + id, {
+    const res = await ApiManager.get('transaction/' + id, {
       headers: {
         'Content-Type': 'application/json',
         'Access-Key': BRANKAZZ_ACCESS_KEY,
@@ -156,7 +152,7 @@ const account_ref = async (
     console.log(bodyParameters);
 
     const res = await ApiManager.post(
-      '/api/check-account-name',
+      'check-account-name',
       bodyParameters,
       config,
     );

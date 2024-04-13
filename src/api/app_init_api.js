@@ -7,7 +7,7 @@ const MAX_RETRIES = 3;
 
 const check_version = async (userKey, userBearerToken) => {
   try {
-    const res = await ApiManager.get('/api/appinit/check-version', {
+    const res = await ApiManager.get('appinit/check-version', {
       headers: {
         'Content-Type': 'application/json',
         'Access-Key': BRANKAZZ_ACCESS_KEY,

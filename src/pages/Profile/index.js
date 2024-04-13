@@ -276,7 +276,13 @@ const ProfileScreen = ({navigation}) => {
                       text: 'OK',
                       onPress: () => {
                         console.log('OK Pressed');
-                        Linking.openURL('https://brankazz.corpo.id');
+                        Linking.openURL(
+                          'https://github.com/dani-ode/brankazz-app/releases/download/v' +
+                            res.data.data.version +
+                            '/Brankazz.v' +
+                            res.data.data.version +
+                            '.apk',
+                        );
                       },
                     },
                   ],

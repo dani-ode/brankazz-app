@@ -9,7 +9,7 @@ const transaction_lists = async (
   userBearerToken,
 ) => {
   try {
-    const res = await ApiManager.get('/api/transaction', {
+    const res = await ApiManager.get('transaction', {
       headers: {
         'Content-Type': 'application/json',
         'Access-Key': BRANKAZZ_ACCESS_KEY,
@@ -33,7 +33,7 @@ const deposit_lists = async (
   userBearerToken,
 ) => {
   try {
-    const res = await ApiManager.get('/api/deposits', {
+    const res = await ApiManager.get('deposits', {
       headers: {
         'Content-Type': 'application/json',
         'Access-Key': BRANKAZZ_ACCESS_KEY,
