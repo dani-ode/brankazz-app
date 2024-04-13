@@ -28,7 +28,7 @@ We welcome contributions from the community! If you find any bugs or have sugges
 
 ## Support
 
-If you encounter any issues or have any questions about Brankazz, please don't hesitate to contact our support team at support@brankazz.corpo.id.
+If you encounter any issues or have any questions about Brankazz, please don't hesitate to contact our support team at brankazz@corpo.id.
 
 ## License
 
