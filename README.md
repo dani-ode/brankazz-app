@@ -1,4 +1,4 @@
-# Brankazz PPOB App
+# Brankazz PPOB App (Front-end)
 
 Welcome to Brankazz, your go-to app for convenient and secure online payments! This React Native application provides a seamless experience for managing various bill payments and transactions.
 
