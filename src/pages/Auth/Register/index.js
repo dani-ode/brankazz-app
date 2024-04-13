@@ -24,6 +24,7 @@ import {Bounce} from 'react-native-animated-spinkit';
 import CheckBox from '@react-native-community/checkbox';
 
 import {BRANKAZZ_BASE_URL} from '@env';
+import {BRANKAZZ_ACCESS_KEY} from '@env';
 
 const Register = props => {
   const [userName, setUserName] = useState('');
@@ -102,7 +103,7 @@ const Register = props => {
       headers: {
         //Header Defination
         'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-        'Access-Key': '3c956f3ef687c89695873c277f1098c1',
+        'Access-Key': BRANKAZZ_ACCESS_KEY,
       },
     })
       .then(response => response.json())
