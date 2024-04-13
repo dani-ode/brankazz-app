@@ -325,7 +325,7 @@ const HomeScreen = () => {
                   handleService({
                     navigation,
                     category: 'Games',
-                    navigation_screen: 'ServicePulsaInputNumber',
+                    navigation_screen: 'ServiceGames',
                     user_balance,
                   })
                 }>

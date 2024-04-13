@@ -290,7 +290,19 @@ const EwalletCheckOut = ({route, navigation}) => {
                 <Text style={styles.text}>Nama </Text>
               </View>
               <View style={styles.col}>
-                <Text style={styles.textValue}>
+                <Text
+                  style={[
+                    styles.textValue,
+                    {
+                      display: 'flex',
+                      alignItems: 'flex-end',
+                      justifyContent: 'flex-end',
+                      textAlign: 'right',
+                      right: 0,
+                      top: 0,
+                      marginLeft: 'auto',
+                    },
+                  ]}>
                   {name != null ? replaceXWithAsterisk(name) : '-'}
                 </Text>
               </View>
@@ -417,6 +429,8 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
+    // space between
+    justifyContent: 'space-between',
   },
   col: {
     flex: 1,

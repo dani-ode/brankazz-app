@@ -35,49 +35,44 @@ const InputNumber = ({route}) => {
 
   const type = 'prabayar';
   let brandCard = '';
-  let brandName = 'XL';
+  let brandName = 'DEFAULT';
 
   // Provider Logo
   let OperatorLogo = Images.OperatorLogo.OperatorLogo;
 
-  if (category == 'Games') {
-    OperatorLogo = Images.GameLogo.mobileLegendsLogo;
-    brandName = 'MOBILE LEGENDS';
-  } else {
-    if (number.length > 6) {
-      const brand = getOperator(number);
-      if (brand.message == 'VALID') {
-        // console.log(brand);
-        // return;
-        brandCard = brand.card;
+  if (number.length > 6) {
+    const brand = getOperator(number);
+    if (brand.message == 'VALID') {
+      // console.log(brand);
+      // return;
+      brandCard = brand.card;
 
-        if (brand.operator === 'Telkomsel') {
-          brandName = 'TELKOMSEL';
-          OperatorLogo = Images.OperatorLogo.TelkomselLogo;
-        } else if (brand.operator === 'Indosat Ooredoo') {
-          brandName = 'INDOSAT';
-          OperatorLogo = Images.OperatorLogo.IndosatOoredooLogo;
-        } else if (brand.operator === 'XL Axiata') {
-          brandName = 'XL';
-          OperatorLogo = Images.OperatorLogo.XLAxiataLogo;
-        } else if (brand.operator === 'Smartfren') {
-          brandName = 'SMARTFREN';
-          OperatorLogo = Images.OperatorLogo.SmartfrenLogo;
-        } else if (brand.operator === 'Net1') {
-          brandName = 'NET1';
-          OperatorLogo = Images.OperatorLogo.Net1Logo;
-        } else if (brand.operator === 'ByRU') {
-          brandName = 'by.U';
-          OperatorLogo = Images.OperatorLogo.ByRULogo;
-        } else if (brand.operator === '3') {
-          brandName = 'TRI';
-          OperatorLogo = Images.OperatorLogo.TriLogo;
-        }
-
-        // brandOperator = brand.operator;
-
-        // console.log(brandOperator);
+      if (brand.operator === 'Telkomsel') {
+        brandName = 'TELKOMSEL';
+        OperatorLogo = Images.OperatorLogo.TelkomselLogo;
+      } else if (brand.operator === 'Indosat Ooredoo') {
+        brandName = 'INDOSAT';
+        OperatorLogo = Images.OperatorLogo.IndosatOoredooLogo;
+      } else if (brand.operator === 'XL Axiata') {
+        brandName = 'XL';
+        OperatorLogo = Images.OperatorLogo.XLAxiataLogo;
+      } else if (brand.operator === 'Smartfren') {
+        brandName = 'SMARTFREN';
+        OperatorLogo = Images.OperatorLogo.SmartfrenLogo;
+      } else if (brand.operator === 'Net1') {
+        brandName = 'NET1';
+        OperatorLogo = Images.OperatorLogo.Net1Logo;
+      } else if (brand.operator === 'ByRU') {
+        brandName = 'by.U';
+        OperatorLogo = Images.OperatorLogo.ByRULogo;
+      } else if (brand.operator === '3') {
+        brandName = 'TRI';
+        OperatorLogo = Images.OperatorLogo.TriLogo;
       }
+
+      // brandOperator = brand.operator;
+
+      // console.log(brandOperator);
     }
   }
 
@@ -143,6 +138,13 @@ const InputNumber = ({route}) => {
           {name: 'Promo', code: 'byru_p', description: 'Harga Termurah'},
           {name: 'Reguler', code: 'byru_r', description: 'Transaksi Cepat'},
         ],
+        DEFAULT: [
+          {
+            name: '',
+            code: 'default',
+            description: '...',
+          },
+        ],
       },
     },
     {
@@ -155,35 +157,73 @@ const InputNumber = ({route}) => {
             code: 'tseldmalam_r',
             description: 'Internet Malam',
           },
-          {name: 'Check', code: 'tseld_check_user', description: 'Cek Paket'},
         ],
         INDOSAT: [
-          {name: 'Promo', code: 'indosat_p', description: 'Harga Termurah'},
-          {name: 'Reguler', code: 'indosat_r', description: 'Transaksi Cepat'},
+          {name: 'Umum', code: 'indodumum_r', description: 'Sering Dipilih'},
+          {name: 'Combo', code: 'indodfc_r', description: 'Freedom Combo'},
+          {name: 'Yellow', code: 'indodyllw_', description: 'Yellow'},
         ],
         SMARTFREN: [
           {
-            name: 'Promo',
-            code: 'smart_p',
-            description: 'Harga Termurah',
+            name: 'Umum',
+            code: 'smartdum_r',
+            description: 'Sering Dipilih',
           },
           {
-            name: 'Reguler',
-            code: 'smart_r',
-            description: 'Transaksi Cepat',
+            name: 'Unlimited',
+            code: 'smartdunli_r',
+            description: 'Paket Unlimited',
+          },
+          {
+            name: 'Volume',
+            code: 'smartdvm_r',
+            description: 'Paket Volume',
+          },
+          {
+            name: 'Gokil',
+            code: 'smartdgm_r',
+            description: 'Gokil Max',
+          },
+          {
+            name: 'Nonstop',
+            code: 'smartdns_r',
+            description: 'Paket Nonstop',
           },
         ],
         TRI: [
-          {name: 'Promo', code: 'three_p', description: 'Harga Termurah'},
-          {name: 'Reguler', code: 'three_r', description: 'Transaksi Cepat'},
+          {
+            name: 'Umum',
+            code: 'treedum_r',
+            description: 'Sering Dipilih',
+          },
+          {
+            name: 'Mini',
+            code: 'treedmini_r',
+            description: 'Paket Mini',
+          },
+          {
+            name: 'Always On',
+            code: 'threedao_r',
+            description: 'Always On',
+          },
+          {
+            name: 'Happy',
+            code: 'treedhpy_r',
+            description: 'Paket Happy',
+          },
         ],
         XL: [
-          {name: 'Promo', code: 'xl_p', description: 'Harga Termurah'},
-          {name: 'Reguler', code: 'xl_r', description: 'Transaksi Cepat'},
+          {name: 'Umum', code: 'xldum_r', description: 'Sering Dipilih'},
+          {name: 'Combo', code: 'xldxc_r', description: 'Xtra Combo'},
+          {name: 'Kuota', code: 'xldxk_r', description: 'Xtra Kuota'},
+          {name: 'Xtra On', code: 'xldxo_r', description: 'Xtra On'},
         ],
-        'by.U': [
-          {name: 'Promo', code: 'byru_p', description: 'Harga Termurah'},
-          {name: 'Reguler', code: 'byru_r', description: 'Transaksi Cepat'},
+        DEFAULT: [
+          {
+            name: '',
+            code: 'default',
+            description: '...',
+          },
         ],
       },
     },
@@ -198,49 +238,23 @@ const InputNumber = ({route}) => {
           {name: 'SMS', code: 'tselns_r', description: 'Combo Sakti'},
         ],
         INDOSAT: [
-          {name: 'Promo', code: 'indosat_p', description: 'Harga Termurah'},
-          {name: 'Reguler', code: 'indosat_r', description: 'Transaksi Cepat'},
-        ],
-        SMARTFREN: [
-          {
-            name: 'Promo',
-            code: 'smart_p',
-            description: 'Harga Termurah',
-          },
-          {
-            name: 'Reguler',
-            code: 'smart_r',
-            description: 'Transaksi Cepat',
-          },
+          {name: 'Umum', code: 'indsn_r', description: 'Sering Dipilih'},
+          {name: 'Unlimited', code: 'indsnu_r', description: 'Unlimited'},
         ],
         TRI: [
-          {name: 'Promo', code: 'three_p', description: 'Harga Termurah'},
-          {name: 'Reguler', code: 'three_r', description: 'Transaksi Cepat'},
+          {name: 'Umum', code: 'treesn_r', description: 'Sering Dipilih'},
+          {name: 'Mania', code: 'treesnm_r', description: 'Mania'},
         ],
         XL: [
-          {name: 'Promo', code: 'xl_p', description: 'Harga Termurah'},
-          {name: 'Reguler', code: 'xl_r', description: 'Transaksi Cepat'},
+          {name: 'Umum', code: 'xlsnu_r', description: 'Sering Dipilih'},
+          {name: 'Sesama', code: 'xlsns_r', description: 'Sesama XL'},
+          {name: 'Anynet', code: 'xlsna_r', description: 'Semua Operator'},
         ],
-        'by.U': [
-          {name: 'Promo', code: 'byru_p', description: 'Harga Termurah'},
-          {name: 'Reguler', code: 'byru_r', description: 'Transaksi Cepat'},
-        ],
-      },
-    },
-    {
-      Games: {
-        'MOBILE LEGENDS': [
+        DEFAULT: [
           {
-            name: 'Mobile Legends',
-            code: 'mlegend_r',
-            description: 'Harga Termurah',
-          },
-        ],
-        'FREE FIRE': [
-          {
-            name: 'Free Fire',
-            code: 'ffire_r',
-            description: 'Harga Termurah',
+            name: 'SMS & Telpon',
+            code: 'default',
+            description: '...',
           },
         ],
       },
@@ -309,7 +323,7 @@ const InputNumber = ({route}) => {
                           styles.buttonText,
                           {color: theme['color-primary-100']},
                         ]}>
-                        {category}
+                        {category == 'Paket SMS & Telpon' ? '' : category}
                         {brandCard ? ' ' + brandCard : ''} {item.name}
                       </Text>
                       <Text style={styles.description}>{item.description}</Text>

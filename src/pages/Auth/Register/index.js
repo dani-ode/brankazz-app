@@ -34,6 +34,9 @@ const Register = props => {
   const [errortext, setErrortext] = useState('');
   const [isRegistraionSuccess, setIsRegistraionSuccess] = useState(false);
 
+  const [showPin, setShowPin] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
   const [checked, setChecked] = useState(false);
 
   const emailInputRef = createRef();
@@ -119,6 +122,14 @@ const Register = props => {
         console.error(error);
       });
   };
+
+  const toggleShowPin = () => {
+    setShowPin(!showPin);
+  };
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
   if (isRegistraionSuccess) {
     return (
       <View
@@ -219,12 +230,21 @@ const Register = props => {
                   keyboardType="numeric"
                   ref={pinInputRef}
                   returnKeyType="next"
-                  secureTextEntry={true}
+                  secureTextEntry={!showPin}
                   onSubmitEditing={() =>
                     phoneInputRef.current && phoneInputRef.current.focus()
                   }
                   blurOnSubmit={false}
                 />
+                <TouchableOpacity
+                  onPress={toggleShowPin}
+                  style={styles.toggleButton}>
+                  <MaterialCommunityIcons
+                    name={showPin ? 'eye' : 'eye-off'}
+                    size={24}
+                    color="gray"
+                  />
+                </TouchableOpacity>
               </View>
               <View style={styles.SectionStyle}>
                 <TextInput
@@ -235,12 +255,21 @@ const Register = props => {
                   placeholderTextColor="#8b9cb5"
                   ref={passwordInputRef}
                   returnKeyType="next"
-                  secureTextEntry={true}
+                  secureTextEntry={!showPassword}
                   onSubmitEditing={() =>
                     phoneInputRef.current && phoneInputRef.current.focus()
                   }
                   blurOnSubmit={false}
                 />
+                <TouchableOpacity
+                  onPress={toggleShowPassword}
+                  style={styles.toggleButton}>
+                  <MaterialCommunityIcons
+                    name={showPassword ? 'eye' : 'eye-off'}
+                    size={24}
+                    color="gray"
+                  />
+                </TouchableOpacity>
               </View>
               <View style={styles.SectionStyle}>
                 <TextInput
@@ -416,6 +445,15 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+
+  toggleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 10,
+    marginBottom: 10,
+    marginLeft: -30,
   },
 
   checkboxText: {

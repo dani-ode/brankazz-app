@@ -33,6 +33,7 @@ class Login extends React.Component {
       email: '',
       password: '',
       isLoading: false,
+      showPassword: false,
     };
     this.getOnboarding();
     this.getData();
@@ -146,6 +147,12 @@ class Login extends React.Component {
     this.props.navigation.navigate('ForgotPassword');
   };
 
+  toggleShowPassword = () => {
+    this.setState(prevState => ({
+      showPassword: !prevState.showPassword,
+    }));
+  };
+
   render() {
     return (
       <SafeAreaView style={styles.container}>
@@ -170,13 +177,24 @@ class Login extends React.Component {
                   autoCapitalize="none"
                   placeholderTextColor={theme['color-primary-500']}
                 />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Password"
-                  onChangeText={password => this.setState({password})}
-                  placeholderTextColor={theme['color-primary-500']}
-                  secureTextEntry
-                />
+                <View style={styles.SectionStyle}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Password"
+                    onChangeText={password => this.setState({password})}
+                    placeholderTextColor={theme['color-primary-500']}
+                    secureTextEntry={!this.state.showPassword}
+                  />
+                  <TouchableOpacity
+                    onPress={this.toggleShowPassword}
+                    style={styles.toggleButton}>
+                    <MaterialCommunityIcons
+                      name={!this.state.showPassword ? 'eye-off' : 'eye'}
+                      size={24}
+                      color="gray"
+                    />
+                  </TouchableOpacity>
+                </View>
 
                 <TouchableOpacity onPress={this.handleForgotPassword}>
                   <Text style={styles.forgotText}>Lupa Password?</Text>
@@ -268,6 +286,19 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     height: 48,
   },
+
+  SectionStyle: {
+    flexDirection: 'row',
+  },
+  toggleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    // marginTop: 10,
+    marginBottom: 10,
+    marginLeft: -35,
+  },
+
   button: {
     backgroundColor: theme['color-secondary-500'],
     paddingVertical: 10,

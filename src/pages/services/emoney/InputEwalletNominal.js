@@ -172,12 +172,12 @@ const InputEwalletNominal = ({route, navigation}) => {
 
       const dest_number = number;
       // const product_sku_code = product_sku_code;
-      const product_category = category;
-      const product_brand = brand;
-      const product_type = type;
-      const connection = 'digiflazz';
-      const description =
-        description ?? 'Transaksi ' + category + ' ' + brand + ' ' + type;
+      // const product_category = category;
+      // const product_brand = brand;
+      // const product_type = type;
+      // const connection = 'digiflazz';
+      // const description =
+      //   description ?? 'Transaksi ' + category + ' ' + brand + ' ' + type;
 
       const userKey = await AsyncStorage.getItem('user-key');
       const userBearerToken = await AsyncStorage.getItem('bearer-token');
@@ -514,6 +514,7 @@ const styles = StyleSheet.create({
     zIndex: 100,
     fontWeight: 'bold',
     borderRadius: 10,
+    color: theme['color-dark-500'],
   },
   inputDescription: {
     height: 52,

@@ -88,7 +88,7 @@ const EditProfile = () => {
         return;
       }
 
-      console.log(userRole, name, email, profileImg);
+      console.log(userRole, name, email, selectImage ?? profileImg);
       await user_update_profile(
         userId,
         userKey,
@@ -96,7 +96,7 @@ const EditProfile = () => {
         userRole,
         name,
         email,
-        profileImg,
+        selectImage ?? profileImg,
       ).then(res => {
         if (res) {
           if (res.status == 201) {

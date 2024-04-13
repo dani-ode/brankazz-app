@@ -39,6 +39,8 @@ import InputDepositNominal from '../pages/Exchange/InputDepositNominal';
 import EwalletCheckOut from '../pages/services/emoney/EwalletCheckOut';
 import EditProfile from '../pages/Profile/EditProfile';
 import SelectLanguage from '../pages/Profile/SelectLanguage';
+import Games from '../pages/services/Games';
+import InputGameNumber from '../pages/services/Games/InputGameNumber';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -308,7 +310,7 @@ export class Routes extends Component {
           <Stack.Screen
             name="ServicePulsaInputNumber"
             component={InputNumber}
-            options={{title: 'Pulsa'}}
+            options={{title: 'Input Nomor'}}
             initialParams={{
               user_balance: '',
               category: '',
@@ -417,6 +419,28 @@ export class Routes extends Component {
             initialParams={{
               user_balance: '',
               category: '',
+            }}
+          />
+
+          {/* Games */}
+          <Stack.Screen
+            name="ServiceGames"
+            component={Games}
+            options={{title: 'Pilih Game'}}
+            initialParams={{
+              user_balance: '',
+              category: '',
+            }}
+          />
+          <Stack.Screen
+            name="ServiceGameInputNumber"
+            component={InputGameNumber}
+            options={{title: 'Masukkan ID'}}
+            initialParams={{
+              user_balance: '',
+              category: '',
+              brand: '',
+              code: '',
             }}
           />
 

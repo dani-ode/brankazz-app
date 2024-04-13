@@ -25,6 +25,11 @@ import {Modal} from '@ui-kitten/components';
 import QRCode from 'react-native-qrcode-svg';
 import CheckBox from '@react-native-community/checkbox';
 
+import {checkVersion} from 'react-native-check-version';
+
+import DeviceInfo from 'react-native-device-info';
+import {check_version} from '../../api/app_init_api';
+
 const ProfileScreen = ({navigation}) => {
   useEffect(() => {
     getUser();
@@ -176,6 +181,13 @@ const ProfileScreen = ({navigation}) => {
     },
     {
       id: 5,
+      image: 'https://img.icons8.com/color/70/000000/facebook-like.png',
+      title: 'Cek Update',
+      code: 'update',
+      url: '',
+    },
+    {
+      id: 6,
       image: 'https://img.icons8.com/color/70/000000/shutdown.png',
       title: 'Logout',
       code: 'logout',
@@ -196,7 +208,7 @@ const ProfileScreen = ({navigation}) => {
     setLoading(false);
   };
 
-  const handleFeatures = item => {
+  const handleFeatures = async item => {
     if (item.code === 'logout') {
       Alert.alert(
         'Log Out',
@@ -220,14 +232,71 @@ const ProfileScreen = ({navigation}) => {
         ],
         {cancelable: false},
       );
-    } else {
-      console.log(item);
-      if (item.url) {
-        // Alert.alert(item.url);
-        Linking.openURL(item.url);
-      } else {
-        navigation.navigate(item.code);
+    } else if (item.code === 'terms' || item.code === 'privacy') {
+      Linking.openURL(item.url);
+    } else if (item.code === 'update') {
+      try {
+        setLoading(true);
+        const userKey = await AsyncStorage.getItem('user-key');
+        const userBearerToken = await AsyncStorage.getItem('bearer-token');
+
+        const version = DeviceInfo.getVersion();
+        console.log('Got version info:', version);
+
+        console.log(userKey, userBearerToken);
+
+        await check_version(userKey, userBearerToken).then(res => {
+          if (res) {
+            if (res.status === 200) {
+              setLoading(false);
+
+              console.log(res.data.data);
+
+              if (res.data.data.version == version) {
+                Alert.alert(
+                  'Update Tidak Tersedia',
+                  'Versi Anda sudah terbaru v' + res.data.data.version,
+                );
+              } else {
+                Alert.alert(
+                  'Update Tersedia',
+                  'Versi Anda v' +
+                    version +
+                    ', silahkan update terlebih dahulu ke v' +
+                    res.data.data.version,
+                  [
+                    {
+                      text: 'Cancel',
+                      onPress: () => {
+                        console.log('Cancel Pressed');
+                      },
+                      style: 'cancel',
+                    },
+                    {
+                      text: 'OK',
+                      onPress: () => {
+                        console.log('OK Pressed');
+                        Linking.openURL('https://brankazz.corpo.id');
+                      },
+                    },
+                  ],
+                  {cancelable: false},
+                );
+              }
+
+              // checkVersion(res.data.data);
+              // setLoading(false);
+            }
+          } else {
+            Alert.alert('Error', 'Periksa Koneksi Anda');
+          }
+        });
+        // Linking.openURL('https://brankazz.corpo.id/update');
+      } catch (error) {
+        Alert.alert('Gagal Memuat', 'Periksa Koneksi Anda');
       }
+    } else {
+      navigation.navigate(item.code);
     }
   };
 
