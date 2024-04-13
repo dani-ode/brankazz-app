@@ -19,8 +19,7 @@ To get started with Brankazz, follow these steps:
 
 1. Clone this repository to your local machine.
 2. Install dependencies by running `npm install` or `yarn install`.
-3. Start the development server with `npm start` or `yarn start`.
-4. Connect your mobile device using the Expo app or run the app on a simulator.
+3. Start the development server with `npm run anroid`.
 
 ## Contributing
 
