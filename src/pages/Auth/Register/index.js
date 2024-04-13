@@ -23,6 +23,8 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {Bounce} from 'react-native-animated-spinkit';
 import CheckBox from '@react-native-community/checkbox';
 
+import {BRANKAZZ_BASE_URL} from '@env';
+
 const Register = props => {
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
@@ -94,7 +96,7 @@ const Register = props => {
     }
     formBody = formBody.join('&');
 
-    fetch('https://brankazz.corpo.id/api/register', {
+    fetch(BRANKAZZ_BASE_URL + 'register', {
       method: 'POST',
       body: formBody,
       headers: {
