@@ -139,8 +139,13 @@ const ProductItem = ({product, onPress}) => {
       style={{marginTop: 15, marginHorizontal: 15}}>
       <Card style={{backgroundColor: '#F1F5F7'}}>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <View style={{flexDirection: 'column'}}>
-            <Text style={{color: '#2e3d49', fontWeight: 'bold'}}>
+          <View style={{flexDirection: 'column', maxWidth: '83%'}}>
+            <Text
+              style={{
+                color: '#2e3d49',
+                fontWeight: 'bold',
+                fontSize: 15,
+              }}>
               {product.product_name}
             </Text>
             <Text style={{fontWeight: 'light', color: '#57636d', fontSize: 11}}>
@@ -153,6 +158,13 @@ const ProductItem = ({product, onPress}) => {
               marginLeft: 10,
               alignContent: 'flex-end',
               alignSelf: 'flex-end',
+              backgroundColor: '#fff',
+              paddingHorizontal: 5,
+              borderRadius: 5,
+              position: 'absolute',
+              right: -20,
+              bottom: -12,
+              zIndex: 1,
             }}>
             {formatCurrency(product.price)}
           </Text>

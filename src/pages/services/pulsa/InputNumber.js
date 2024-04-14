@@ -231,11 +231,36 @@ const InputNumber = ({route}) => {
       'Paket SMS & Telpon': {
         TELKOMSEL: [
           {
-            name: 'Telephone',
-            code: 'tselsns_r',
-            description: 'Transaksi Cepat',
+            name: 'Telp Normal',
+            code: 'tselns_r',
+            description: 'Harga Normal',
           },
-          {name: 'SMS', code: 'tselns_r', description: 'Combo Sakti'},
+          {
+            name: 'Telp Spesial',
+            code: 'tselsns_r',
+            description: 'Harga Spesial',
+          },
+          {
+            name: 'Bulk',
+            code: 'tselnk_r',
+            description: 'Kring Kring Bulk',
+          },
+          {
+            name: 'Pass',
+            code: 'tselnp_r',
+            description: 'Telepon Pass',
+          },
+          {
+            name: 'Semua Opr',
+            code: 'tselnso_r',
+            description: 'Telp Semua Operator',
+          },
+          {
+            name: 'Sesama',
+            code: 'tselnsso_r',
+            description: 'Telp Sesama Operator',
+          },
+          {name: 'SMS', code: 'tselnsm_r', description: 'Khusus SMS'},
         ],
         INDOSAT: [
           {name: 'Umum', code: 'indsn_r', description: 'Sering Dipilih'},
