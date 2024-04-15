@@ -57,6 +57,11 @@ const PriceList = ({route, navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
 
   const selectProduct = item => {
+    if (!item.buyer_product_status || !item.seller_product_status) {
+      Alert.alert('Tidak Aktif!', item.product_name);
+      return;
+    }
+
     const product_sku_code = item.product_sku_code;
     const product_price = item.price;
     navigation.navigate('CheckOut', {
@@ -116,6 +121,7 @@ const PriceList = ({route, navigation}) => {
             <ProductItem
               key={item.product_sku_code}
               product={item}
+              isActive={item.buyer_product_status && item.seller_product_status}
               onPress={() => selectProduct(item)}
             />
           );
@@ -127,7 +133,7 @@ const PriceList = ({route, navigation}) => {
   );
 };
 
-const ProductItem = ({product, onPress}) => {
+const ProductItem = ({product, isActive, onPress}) => {
   function formatCurrency(amount) {
     amount = amount.toFixed(0).replace(/(\d)(?=(\d{3})+\b)/g, '$1.');
     return amount;
@@ -137,24 +143,44 @@ const ProductItem = ({product, onPress}) => {
     <TouchableOpacity
       onPress={onPress}
       style={{marginTop: 15, marginHorizontal: 15}}>
-      <Card style={{backgroundColor: '#F1F5F7'}}>
+      <Card style={{backgroundColor: !isActive ? '#EDF5F7' : '#F1F5F7'}}>
+        <View
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            zIndex: 1,
+            padding: 8,
+            backgroundColor: 'rgba(180, 180, 180, 0.5)',
+
+            display: !isActive ? 'flex' : 'none',
+          }}>
+          <Text style={{fontWeight: 'bold', color: '#57636d'}}>
+            Tidak aktif
+          </Text>
+        </View>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <View style={{flexDirection: 'column', maxWidth: '83%'}}>
             <Text
               style={{
-                color: '#2e3d49',
+                color: !isActive ? '#8E9DA7' : '#2e3d49',
                 fontWeight: 'bold',
                 fontSize: 15,
               }}>
               {product.product_name}
             </Text>
-            <Text style={{fontWeight: 'light', color: '#57636d', fontSize: 11}}>
+            <Text
+              style={{
+                fontWeight: 'light',
+                color: !isActive ? '#8E9DA7' : '#57636d',
+                fontSize: 13,
+              }}>
               Layanan {product.end_cut_off} s/d {product.start_cut_off}
             </Text>
           </View>
           <Text
             style={{
-              color: '#2e3d49',
+              color: !isActive ? '#8E9DA7' : '#2e3d49',
               marginLeft: 10,
               alignContent: 'flex-end',
               alignSelf: 'flex-end',
