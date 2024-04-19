@@ -34,7 +34,7 @@ const Internet = ({route, navigation}) => {
     const brand = item.brand;
     const code = item.code;
 
-    navigation.navigate('ServiceGameInputNumber', {
+    navigation.navigate('ServiceInternetInputId', {
       user_balance,
       category,
       brand,

@@ -375,7 +375,7 @@ const HomeScreen = () => {
                 <View style={[styles.col]}>
                   <View style={[styles.serviceIcon, styles.serviceItemAll]}>
                     <MaterialCommunityIcons
-                      name="home-city"
+                      name="server-network"
                       size={24}
                       color={theme['color-secondary-800']}
                     />

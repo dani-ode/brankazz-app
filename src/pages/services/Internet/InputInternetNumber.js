@@ -20,6 +20,7 @@ import {Image} from 'react-native';
 import Images from '../../../assets/images';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {account_ref} from '../../../api/transaction_api';
+import {Bounce} from 'react-native-animated-spinkit';
 
 const InputInternetNumber = ({route}) => {
   const {user_balance, category, brand, code} = route.params;
@@ -27,6 +28,8 @@ const InputInternetNumber = ({route}) => {
   const [number, setNumber] = useState(0);
 
   const [user, setUser] = useState({});
+
+  const [isLoading, setLoading] = useState(false);
 
   const brand_lowerCase = brand.toLowerCase();
 
@@ -62,86 +65,118 @@ const InputInternetNumber = ({route}) => {
 
       console.log(userBearerToken, userKey, dest_number, product_sku_code);
 
+      // return;
+
       await postpaid_inquiry(
         userBearerToken,
         userKey,
         dest_number,
         product_sku_code,
-      ).then(res => {
-        // console.log(res.status);
-        setLoading(false);
-        if (res) {
-          if (res.status === 201) {
-            console.log(res.data.data);
+      )
+        .then(res => {
+          // console.log(res.status);
+          setLoading(false);
+          if (res) {
+            if (res.status === 201) {
+              console.log(res.data.data);
 
-            // Extracting desired data
-            const name = res.data.data.digiflazz_data.customer_name;
+              // Extracting desired data
+              const name = res.data.data.digiflazz_data.customer_name;
 
-            const admin_fee = res.data.data.digiflazz_data.admin;
-            const product_price = res.data.data.digiflazz_data.selling_price;
-            const ref_id = res.data.data.digiflazz_data.ref_id;
-            const signature = res.data.data.signature;
+              const admin_fee = res.data.data.digiflazz_data.admin;
+              const product_price = res.data.data.digiflazz_data.selling_price;
+              const ref_id = res.data.data.digiflazz_data.ref_id;
+              const signature = res.data.data.signature;
 
-            // console.log(admin_fee, product_price, ref_id, signature);
+              // console.log(admin_fee, product_price, ref_id, signature);
 
-            navigation.replace('EwalletCheckOut', {
-              type,
-              user_balance,
-              category,
-              brand,
-              product_sku_code,
-              ref_id,
-              number,
-              name,
-              admin_fee,
-              product_price,
-              signature,
-            });
+              navigation.replace('EwalletCheckOut', {
+                type,
+                user_balance,
+                category,
+                brand,
+                product_sku_code,
+                ref_id,
+                number,
+                name,
+                admin_fee,
+                product_price,
+                signature,
+              });
+            }
+          } else {
+            setLoading(false);
+            Alert.alert('Error', res.data.message);
           }
-        } else {
-          Alert.alert('Error', res.data.message);
-        }
-      });
+        })
+        .catch(err => {
+          setLoading(false);
+          console.error(err);
+        });
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       console.error(error);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <View style={[styles.row, styles.provider]}>
-        <View style={styles.providerLogoContainer}>
-          <Image style={styles.providerLogo} source={FintechLogo} />
+    <>
+      <View style={styles.container}>
+        <View style={[styles.row, styles.provider]}>
+          <View style={styles.providerLogoContainer}>
+            <Image style={styles.providerLogo} source={FintechLogo} />
+          </View>
+          <View style={[styles.column, {flexDirection: 'column'}]}>
+            <Text style={styles.description}>{brand}</Text>
+          </View>
         </View>
-        <View style={[styles.column, {flexDirection: 'column'}]}>
-          <Text style={styles.description}>{brand}</Text>
+        {/* <View style={styles.row}> */}
+        <Card style={styles.card}>
+          <TextInput
+            keyboardType="numeric"
+            style={styles.input}
+            placeholder="Masukkan Nomor"
+            autoFocus={true}
+            placeholderTextColor={theme['color-primary-500']}
+            onChangeText={number => setNumber(number)}
+            maxLength={20}
+          />
+        </Card>
+        {/* </View> */}
+        <View style={styles.submitContainer}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => handlePostPaid(number)}>
+            <Text style={styles.buttonText}>Lanjutkan</Text>
+          </TouchableOpacity>
         </View>
       </View>
-      {/* <View style={styles.row}> */}
-      <Card style={styles.card}>
-        <TextInput
-          keyboardType="numeric"
-          style={styles.input}
-          placeholder="Masukkan Nomor"
-          autoFocus={true}
-          placeholderTextColor={theme['color-primary-500']}
-          onChangeText={number => setNumber(number)}
-          maxLength={20}
-        />
-      </Card>
-      {/* </View> */}
-      <View style={styles.submitContainer}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => handlePostPaid(number)}>
-          <Text style={styles.buttonText}>Lanjutkan</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+      <Bounce
+        size={48}
+        color={theme['color-secondary-500']}
+        style={[styles.spinkitLoader, {display: isLoading ? 'flex' : 'none'}]}
+      />
+    </>
   );
 };
 
 const styles = StyleSheet.create({
+  spinkitLoader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme['color-dark-500'],
+    opacity: 0.7,
+    position: 'absolute',
+    zIndex: 1000,
+    width: '100%',
+    height: '100%',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
+  },
   container: {
     flex: 1,
     backgroundColor: theme['color-dark-gray-200'],

@@ -225,8 +225,8 @@ const CheckOut = ({route, navigation}) => {
           }
         })
         .catch(err => {
-          Alert.alert('Error', err.response.data.message);
           setLoading(false);
+          Alert.alert('Error', err.response.data.message);
         });
     } catch (error) {
       setLoading(false);

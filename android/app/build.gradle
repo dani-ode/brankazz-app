@@ -83,7 +83,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         missingDimensionStrategy 'react-native-camera', 'general'
         versionCode 10
-        versionName "1.0.74"
+        versionName "1.0.76"
     }
     signingConfigs {
         release {

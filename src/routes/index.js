@@ -42,6 +42,7 @@ import SelectLanguage from '../pages/Profile/SelectLanguage';
 import Games from '../pages/services/Games';
 import InputGameNumber from '../pages/services/Games/InputGameNumber';
 import Internet from '../pages/services/Internet';
+import InputInternetNumber from '../pages/services/Internet/InputInternetNumber';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -453,6 +454,18 @@ export class Routes extends Component {
             initialParams={{
               user_balance: '',
               category: '',
+            }}
+          />
+
+          <Stack.Screen
+            name="ServiceInternetInputId"
+            component={InputInternetNumber}
+            options={{title: 'Masukkan Nomor'}}
+            initialParams={{
+              user_balance: '',
+              category: '',
+              brand: '',
+              code: '',
             }}
           />
 

@@ -148,20 +148,25 @@ const CheckoutKmp = ({route, navigation}) => {
         amount,
         connection,
         new_description,
-      ).then(res => {
-        setLoading(false);
-        // console.log(res.status);
-        if (res) {
-          if (res.status === 201) {
-            console.log(res.data.data);
-            console.log('Transaction ID' + res.data.data.id);
+      )
+        .then(res => {
+          setLoading(false);
+          // console.log(res.status);
+          if (res) {
+            if (res.status === 201) {
+              console.log(res.data.data);
+              console.log('Transaction ID' + res.data.data.id);
 
-            navigation.replace('TransactionDetail', {id: res.data.data.id});
+              navigation.replace('TransactionDetail', {id: res.data.data.id});
+            }
+          } else {
+            Alert.alert('Error', 'Terjadi kesalahan, silahkan coba lagi');
           }
-        } else {
+        })
+        .catch(err => {
+          setLoading(false);
           Alert.alert('Error', 'Terjadi kesalahan, silahkan coba lagi');
-        }
-      });
+        });
     } catch (error) {
       setLoading(false);
       console.error(error);

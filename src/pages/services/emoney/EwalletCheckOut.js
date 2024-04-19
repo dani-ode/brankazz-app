@@ -172,17 +172,25 @@ const EwalletCheckOut = ({route, navigation}) => {
         description,
         ref_id,
         signature,
-      ).then(res => {
-        // console.log(res.status);
-        if (res.status === 201) {
-          console.log(res.data.data);
-          console.log('Transaction ID' + res.data.data.id);
-
+      )
+        .then(res => {
+          // console.log(res.status);
           setLoading(false);
-          navigation.replace('TransactionDetail', {id: res.data.data.id});
-        }
-      });
+          if (res.status === 201) {
+            console.log(res.data.data);
+            console.log('Transaction ID' + res.data.data.id);
+
+            navigation.replace('TransactionDetail', {id: res.data.data.id});
+          }
+        })
+        .catch(err => {
+          setLoading(false);
+          Alert.alert('Error', err.response.data.message, [
+            {text: 'OK', onPress: () => navigation.goBack()},
+          ]);
+        });
     } catch (error) {
+      setLoading(false);
       console.error(error);
     }
   };
