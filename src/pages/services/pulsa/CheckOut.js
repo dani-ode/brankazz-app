@@ -209,17 +209,27 @@ const CheckOut = ({route, navigation}) => {
         amount,
         connection,
         description,
-      ).then(res => {
-        // console.log(res.status);
-        if (res.status === 201) {
-          console.log(res.data.data);
-          console.log('Transaction ID' + res.data.data.id);
-
+      )
+        .then(res => {
+          // console.log(res.status);
           setLoading(false);
-          navigation.replace('TransactionDetail', {id: res.data.data.id});
-        }
-      });
+          if (res) {
+            if (res.status === 201) {
+              console.log(res.data.data);
+              console.log('Transaction ID' + res.data.data.id);
+
+              navigation.replace('TransactionDetail', {id: res.data.data.id});
+            }
+          } else {
+            Alert.alert('Error', 'Terjadi kesalahan, silahkan coba lagi');
+          }
+        })
+        .catch(err => {
+          Alert.alert('Error', err.response.data.message);
+          setLoading(false);
+        });
     } catch (error) {
+      setLoading(false);
       console.error(error);
     }
   };

@@ -21,7 +21,7 @@ import Images from '../../../assets/images';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {account_ref} from '../../../api/transaction_api';
 
-const InputGameNumber = ({route}) => {
+const InputInternetNumber = ({route}) => {
   const {user_balance, category, brand, code} = route.params;
   const navigation = useNavigation();
   const [number, setNumber] = useState(0);
@@ -31,42 +31,80 @@ const InputGameNumber = ({route}) => {
   const brand_lowerCase = brand.toLowerCase();
 
   // Provider Logo
-  if (code === 'mlegend_') {
-    FintechLogo = Images.GameLogo.mobileLegendsLogo;
-  } else if (code === 'ffire_') {
-    FintechLogo = Images.GameLogo.freeFireLogo;
-  } else if (code === 'pubgm_') {
-    FintechLogo = Images.GameLogo.pubgMobileLogo;
-  } else if (code === 'ghimpct_') {
-    FintechLogo = Images.GameLogo.genshinImpactLogo;
+  if (code === 'pasca_int_indihome') {
+    FintechLogo = Images.InternetLogo.speedyAndTelkomselLogo;
+  } else if (code === 'pasca_int_iconnet') {
+    FintechLogo = Images.InternetLogo.iconnectLogo;
+  } else if (code === 'pasca_int_myrebpubic') {
+    FintechLogo = Images.InternetLogo.myRepublicLogo;
+  } else if (code === 'pasca_int_cbn') {
+    FintechLogo = Images.InternetLogo.cbnLogo;
+  } else if (code === 'pasca_int_telkompstn') {
+    FintechLogo = Images.InternetLogo.telkompstnLogo;
   }
 
-  const handleProduct = async (by_type, number) => {
-    // console.log(by_type, number, brandName);
+  const handlePostPaid = async number => {
+    try {
+      if (!number || number.length < 3) {
+        Alert.alert('Masukkan nomor yang valid');
+        return;
+      }
 
-    if (!number || number.length < 4) {
-      Alert.alert('Masukkan nomor yang valid');
-      return;
+      setLoading(true);
+
+      const product_sku_code = code;
+      let type = 'pascabayar';
+
+      const dest_number = number;
+
+      const userKey = await AsyncStorage.getItem('user-key');
+      const userBearerToken = await AsyncStorage.getItem('bearer-token');
+
+      console.log(userBearerToken, userKey, dest_number, product_sku_code);
+
+      await postpaid_inquiry(
+        userBearerToken,
+        userKey,
+        dest_number,
+        product_sku_code,
+      ).then(res => {
+        // console.log(res.status);
+        setLoading(false);
+        if (res) {
+          if (res.status === 201) {
+            console.log(res.data.data);
+
+            // Extracting desired data
+            const name = res.data.data.digiflazz_data.customer_name;
+
+            const admin_fee = res.data.data.digiflazz_data.admin;
+            const product_price = res.data.data.digiflazz_data.selling_price;
+            const ref_id = res.data.data.digiflazz_data.ref_id;
+            const signature = res.data.data.signature;
+
+            // console.log(admin_fee, product_price, ref_id, signature);
+
+            navigation.replace('EwalletCheckOut', {
+              type,
+              user_balance,
+              category,
+              brand,
+              product_sku_code,
+              ref_id,
+              number,
+              name,
+              admin_fee,
+              product_price,
+              signature,
+            });
+          }
+        } else {
+          Alert.alert('Error', res.data.message);
+        }
+      });
+    } catch (error) {
+      console.error(error);
     }
-
-    // console.log(number.length);
-
-    // return;
-
-    const type = 'prabayar';
-
-    console.log(number, category, brand, by_type, type, user_balance);
-
-    // return;
-
-    navigation.navigate('PriceList', {
-      number: number,
-      category: category,
-      brand: brand,
-      product_sku_code_type: by_type,
-      type: type,
-      user_balance: user_balance,
-    });
   };
 
   return (
@@ -95,7 +133,7 @@ const InputGameNumber = ({route}) => {
       <View style={styles.submitContainer}>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => handleProduct(code + 'r', number)}>
+          onPress={() => handlePostPaid(number)}>
           <Text style={styles.buttonText}>Lanjutkan</Text>
         </TouchableOpacity>
       </View>
@@ -193,4 +231,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default InputGameNumber;
+export default InputInternetNumber;

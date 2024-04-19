@@ -15,7 +15,7 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import {default as theme} from '../../../../theme.json';
 import Images from '../../../assets/images';
 
-const Games = ({route, navigation}) => {
+const Internet = ({route, navigation}) => {
   const {user_balance, category} = route.params;
 
   console.log(user_balance, category);
@@ -45,24 +45,29 @@ const Games = ({route, navigation}) => {
   const getFintech = async () => {
     setFintech([
       {
-        brand: 'MOBILE LEGENDS',
-        code: 'mlegend_',
-        logo: Images.GameLogo.mobileLegendsLogo,
+        brand: 'Indohome & Speedy',
+        code: 'pasca_int_indihome',
+        logo: Images.InternetLogo.speedyAndTelkomselLogo,
       },
       {
-        brand: 'FREE FIRE',
-        code: 'ffire_',
-        logo: Images.GameLogo.freeFireLogo,
+        brand: 'IConnect',
+        code: 'pasca_int_iconnet',
+        logo: Images.InternetLogo.iconnectLogo,
       },
       {
-        brand: 'PUBG MOBILE',
-        code: 'pubgm_',
-        logo: Images.GameLogo.pubgMobileLogo,
+        brand: 'MyRepublic',
+        code: 'pasca_int_myrebpubic',
+        logo: Images.InternetLogo.myRepublicLogo,
       },
       {
-        brand: 'Genshin Impact',
-        code: 'ghimpct_',
-        logo: Images.GameLogo.genshinImpactLogo,
+        brand: 'CBN Fiber',
+        code: 'pasca_int_cbn',
+        logo: Images.InternetLogo.cbnLogo,
+      },
+      {
+        brand: 'Telkom PSTN',
+        code: 'pasca_int_telkompstn',
+        logo: Images.InternetLogo.telkompstnLogo,
       },
     ]);
     setLoading(false);
@@ -137,4 +142,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Games;
+export default Internet;

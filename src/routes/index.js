@@ -41,6 +41,7 @@ import EditProfile from '../pages/Profile/EditProfile';
 import SelectLanguage from '../pages/Profile/SelectLanguage';
 import Games from '../pages/services/Games';
 import InputGameNumber from '../pages/services/Games/InputGameNumber';
+import Internet from '../pages/services/Internet';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -396,7 +397,7 @@ export class Routes extends Component {
           <Stack.Screen
             name="EwalletCheckOut"
             component={EwalletCheckOut}
-            options={{title: 'Masukkan Nominal'}}
+            options={{title: 'Check Out'}}
             initialParams={{
               type: '',
               user_balance: '',
@@ -441,6 +442,17 @@ export class Routes extends Component {
               category: '',
               brand: '',
               code: '',
+            }}
+          />
+
+          {/* Internet Pascabayar */}
+          <Stack.Screen
+            name="ServiceInternet"
+            component={Internet}
+            options={{title: 'Pilih Provider'}}
+            initialParams={{
+              user_balance: '',
+              category: '',
             }}
           />
 

@@ -40,6 +40,15 @@ const Images = {
   GameLogo: {
     mobileLegendsLogo: require('./game-logo/mobile-legends.png'),
     freeFireLogo: require('./game-logo/free-fire.png'),
+    genshinImpactLogo: require('./game-logo/genshin-impact.png'),
+    pubgMobileLogo: require('./game-logo/pubg-mobile.png'),
+  },
+  InternetLogo: {
+    speedyAndTelkomselLogo: require('./intprovider-logo/speedy-and-telkomsel.png'),
+    iconnectLogo: require('./intprovider-logo/iconnect.png'),
+    myRepublicLogo: require('./intprovider-logo/myrepublic.png'),
+    cbnLogo: require('./intprovider-logo/cbn.png'),
+    telkompstnLogo: require('./intprovider-logo/telkompstn.png'),
   },
 };
 

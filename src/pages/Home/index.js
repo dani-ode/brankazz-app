@@ -365,10 +365,12 @@ const HomeScreen = () => {
               <TouchableOpacity
                 style={styles.service}
                 onPress={() =>
-                  Alert.alert(
-                    'Coming Soon',
-                    'Fitur ini sedang dalam tahap pengembangan',
-                  )
+                  handleService({
+                    navigation,
+                    category: 'Internet',
+                    navigation_screen: 'ServiceInternet',
+                    user_balance,
+                  })
                 }>
                 <View style={[styles.col]}>
                   <View style={[styles.serviceIcon, styles.serviceItemAll]}>
@@ -378,7 +380,7 @@ const HomeScreen = () => {
                       color={theme['color-secondary-800']}
                     />
                   </View>
-                  <Text style={styles.serviceTextAll}>PBB</Text>
+                  <Text style={styles.serviceTextAll}>Internet</Text>
                 </View>
               </TouchableOpacity>
 

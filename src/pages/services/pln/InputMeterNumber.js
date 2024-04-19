@@ -79,7 +79,7 @@ export default function InputMeterNumber({route, navigation}) {
 
   const handlePostPaid = async number => {
     try {
-      if (number.length < 11 || number.length > 12) {
+      if (!number || number.length < 11 || number.length > 12) {
         Alert.alert('Masukkan nomor yang valid');
         return;
       }
@@ -110,6 +110,8 @@ export default function InputMeterNumber({route, navigation}) {
         product_sku_code,
       ).then(res => {
         // console.log(res.status);
+
+        setLoading(false);
         if (res) {
           if (res.status === 201) {
             console.log(res.data.data);
@@ -124,7 +126,6 @@ export default function InputMeterNumber({route, navigation}) {
 
             // console.log(admin_fee, product_price, ref_id, signature);
 
-            setLoading(false);
             navigation.replace('EwalletCheckOut', {
               type,
               user_balance,

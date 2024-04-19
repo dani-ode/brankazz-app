@@ -62,14 +62,14 @@ const EwalletCheckOut = ({route, navigation}) => {
       console.log(userId, userKey, userBearerToken);
 
       await user_profile(userId, userKey, userBearerToken).then(res => {
+        setLoading(false);
         if (res.status === 200) {
           setUser(res.data.data);
           // setLoading(false);
-
-          setLoading(false);
         }
       });
     } catch (error) {
+      setLoading(false);
       console.error(error);
     }
   };

@@ -151,7 +151,7 @@ const ProductItem = ({product, isActive, onPress}) => {
             top: 0,
             zIndex: 1,
             padding: 8,
-            backgroundColor: 'rgba(180, 180, 180, 0.5)',
+            backgroundColor: 'rgba(180, 180, 180, 0.7)',
 
             display: !isActive ? 'flex' : 'none',
           }}>

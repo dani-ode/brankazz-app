@@ -21,10 +21,10 @@ const EditProfile = () => {
   useEffect(() => {
     getUser();
 
-    const interval = setInterval(() => {
-      getUser();
-    }, 10000);
-    return () => clearInterval(interval);
+    // const interval = setInterval(() => {
+    // getUser();
+    // }, 10000);
+    // return () => clearInterval(interval);
   }, []);
 
   const [user, setUser] = useState({});
@@ -98,11 +98,11 @@ const EditProfile = () => {
         email,
         selectImage ?? profileImg,
       ).then(res => {
+        setLoading(false);
         if (res) {
           if (res.status == 201) {
             setUser(res.data.data);
             // console.log(res.data.data);
-            setLoading(false);
           }
         }
       });

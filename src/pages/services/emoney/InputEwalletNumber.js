@@ -84,10 +84,13 @@ const InputEwalletNumber = ({route}) => {
         return;
       }
 
+      let cleanedPhoneNumber = number.replace(/\D/g, ''); // Removes all non-numeric characters
+      cleanedPhoneNumber = cleanedPhoneNumber.replace(/^62/, '0'); // Replaces the first occurrence of "62" with "0"
+
       await account_ref(
         userKey,
         userBearerToken,
-        number,
+        cleanedPhoneNumber,
         product_sku_code,
         brand,
       ).then(res => {
@@ -103,7 +106,7 @@ const InputEwalletNumber = ({route}) => {
               user_balance: user_balance,
               category: category,
               brand: brand,
-              number: number,
+              number: cleanedPhoneNumber,
               name: res.data.data.name,
               code: code,
               relativeCode: relativeCode,

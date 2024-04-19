@@ -92,8 +92,13 @@ const InputNumber = ({route}) => {
       return;
     }
     const brand_name = brandName;
+
+    let cleanedPhoneNumber = number.replace(/\D/g, ''); // Removes all non-numeric characters
+    cleanedPhoneNumber = cleanedPhoneNumber.replace(/^62/, '0'); // Replaces the first occurrence of "62" with "0"
+    console.log(cleanedPhoneNumber);
+
     navigation.navigate('PriceList', {
-      number: number,
+      number: cleanedPhoneNumber,
       category: category,
       brand: brand_name,
       product_sku_code_type: by_type,
