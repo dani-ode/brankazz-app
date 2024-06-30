@@ -217,22 +217,25 @@ const InputDepositNominal = ({route, navigation}) => {
             </View>
 
             <View style={styles.line} />
-            <View style={styles.row}>
+
+            {/* <View style={styles.row}>
               <View style={styles.col}>
                 <Text style={styles.text}>Number </Text>
               </View>
               <View style={styles.col}>
                 <Text style={styles.textValue}>{partner_billing_number}</Text>
               </View>
-            </View>
-            <View style={styles.row}>
+            </View> */}
+
+            {/* <View style={styles.row}>
               <View style={styles.col}>
                 <Text style={styles.text}>Nama </Text>
               </View>
               <View style={styles.col}>
                 <Text style={styles.textValue}>{partner_billing_name}</Text>
               </View>
-            </View>
+            </View> */}
+
             <View style={styles.row}>
               <View style={styles.col}>
                 <Text style={styles.text}>Tipe </Text>

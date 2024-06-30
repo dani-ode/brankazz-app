@@ -19,8 +19,9 @@ import ViewShot, {captureRef} from 'react-native-view-shot';
 
 import Share from 'react-native-share';
 import Images from '../../../assets/images';
+import {CommonActions} from '@react-navigation/native';
 
-export default function TransactionDetail({route}) {
+export default function TransactionDetail({route, navigation}) {
   const {id} = route.params;
 
   const [transaction, setTransaction] = useState({});
@@ -295,6 +296,30 @@ export default function TransactionDetail({route}) {
               </Card>
             </ViewShot>
           </Layout>
+
+          {/* Back To Home Button */}
+          <Layout style={styles.backToHomeButtonContainer}>
+            <View
+              style={[
+                styles.backToHomeButton,
+                {display: transaction.status == 'Sukses' ? 'flex' : 'none'},
+              ]}>
+              <TouchableOpacity
+                mode="contained"
+                onPress={() => {
+                  navigation.dispatch(
+                    CommonActions.reset({
+                      index: 0,
+                      routes: [{name: 'Pages'}],
+                    }),
+                  );
+                }}>
+                <Text>
+                  <MaterialCommunityIcons name="home" size={18} /> Back To Home
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </Layout>
         </ScrollView>
       </View>
     </>
@@ -324,6 +349,7 @@ const styles = StyleSheet.create({
   layout: {
     padding: 24,
     backgroundColor: theme['color-dark-gray-200'],
+    marginBottom: 50,
   },
   receiptCard: {
     // paddingVertical: 8,
@@ -410,5 +436,29 @@ const styles = StyleSheet.create({
   bkvalue: {
     fontSize: 14,
     color: theme['color-dark-gray-100'],
+  },
+
+  backToHomeButtonContainer: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    alignItems: 'center',
+    backgroundColor: theme['color-dark-gray-200'],
+  },
+
+  backToHomeButton: {
+    backgroundColor: theme['color-secondary-500'],
+    color: theme['color-secondary-700'],
+    borderRadius: 10,
+    shadowOffset: {
+      width: 20,
+      height: 20,
+    },
+    shadowOpacity: 0.1,
+    shadowColor: theme['color-dark-100'],
+    shadowRadius: 20,
+    elevation: 3,
+    padding: 10,
+    // marginTop: 20,
   },
 });

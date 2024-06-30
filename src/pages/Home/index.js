@@ -298,6 +298,46 @@ const HomeScreen = () => {
                 </View>
               </TouchableOpacity>
 
+              {/* <TouchableOpacity
+                style={styles.service}
+                onPress={() =>
+                  Alert.alert(
+                    'Coming Soon',
+                    'Fitur ini sedang dalam tahap pengembangan',
+                  )
+                }>
+                <View style={[styles.col]}>
+                  <View style={[styles.serviceIcon, styles.serviceItemAll]}>
+                    <MaterialCommunityIcons
+                      name="ticket"
+                      size={24}
+                      color={theme['color-secondary-800']}
+                    />
+                  </View>
+                  <Text style={styles.serviceTextAll}>Voucer</Text>
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.service}
+                onPress={() =>
+                  Alert.alert(
+                    'Coming Soon',
+                    'Fitur ini sedang dalam tahap pengembangan',
+                  )
+                }>
+                <View style={[styles.col]}>
+                  <View style={[styles.serviceIcon, styles.serviceItemAll]}>
+                    <MaterialCommunityIcons
+                      name="calendar-clock"
+                      size={24}
+                      color={theme['color-secondary-800']}
+                    />
+                  </View>
+                  <Text style={styles.serviceTextAll}>Masa Aktif</Text>
+                </View>
+              </TouchableOpacity> */}
+
               <TouchableOpacity
                 style={styles.service}
                 onPress={() =>
@@ -343,6 +383,15 @@ const HomeScreen = () => {
             </View>
             <View style={[styles.row, styles.serviceListAll]}>
               <TouchableOpacity
+                // style={styles.service}
+                // onPress={() =>
+                //   handleService({
+                //     navigation,
+                //     category: 'pln',
+                //     navigation_screen: 'ServiceInputBpjsNumber',
+                //     user_balance,
+                //   })
+                // }
                 style={styles.service}
                 onPress={() =>
                   Alert.alert(
@@ -400,7 +449,7 @@ const HomeScreen = () => {
                       color={theme['color-secondary-800']}
                     />
                   </View>
-                  <Text style={styles.serviceTextAll}>TV Kabel</Text>
+                  <Text style={styles.serviceTextAll}>TV</Text>
                 </View>
               </TouchableOpacity>
 
@@ -557,11 +606,13 @@ const styles = StyleSheet.create({
   },
 
   serviceList: {
-    marginLeft: -24,
     justifyContent: 'space-between',
+    flexDirection: 'row',
+
+    // backgroundColor: 'red',
   },
   service: {
-    padding: 5,
+    padding: 'auto',
   },
   serviceItem: {
     borderColor: 'black', // Add your styles here
@@ -570,8 +621,8 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     borderWidth: 1,
     borderColor: theme['color-primary-500'],
-    width: 54,
-    height: 54,
+    width: 50,
+    height: 50,
 
     borderRightColor: theme['color-dark-gray-800'],
     borderBottomColor: theme['color-dark-gray-800'],

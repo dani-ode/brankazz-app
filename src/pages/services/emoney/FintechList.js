@@ -50,15 +50,17 @@ const FintechList = ({route, navigation}) => {
   const getFintech = async () => {
     setFintech([
       {
-        brand: 'Gopay Customer',
+        brand: 'Go Pay',
         code: 'gopayc_',
+        type: 'Customer',
         relativeCode: 'gopay_relative',
         checkUserCode: 'gopay_check_user',
         logo: Images.FintechLogo.gopaycLogo,
       },
       {
-        brand: 'Gopay Driver',
+        brand: 'Go Pay',
         code: 'gopayd_',
+        type: 'Driver',
         relativeCode: 'gopay_relative',
         checkUserCode: 'gopay_check_user',
         logo: Images.FintechLogo.gopaydLogo,

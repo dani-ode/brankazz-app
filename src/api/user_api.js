@@ -67,13 +67,11 @@ const user_update_profile = async (
         'User-Key': userKey,
         Authorization: `Bearer ${userBearerToken}`,
         'Content-Type': 'multipart/form-data',
+        'Admin-Key': userRole == 'admin' ? BRANKAZZ_ADMIN_KEY : '',
       },
     };
 
     const formData = new FormData();
-    if (userRole == 'admin') {
-      formData.append('admin_key', BRANKAZZ_ADMIN_KEY);
-    }
     formData.append('name', name);
     formData.append('email', email);
     formData.append('profile_img', {

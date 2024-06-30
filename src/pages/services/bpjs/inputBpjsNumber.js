@@ -12,14 +12,14 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {Bounce} from 'react-native-animated-spinkit';
 
-export default function InputMeterNumber({route, navigation}) {
+export default function InputBpjsNumber({route, navigation}) {
   const {user_balance, category} = route.params;
   const [number, setNumber] = useState('');
   const [meter, setMeterDetail] = useState({});
 
   const [isLoading, setLoading] = useState(false);
 
-  const brand = 'pln';
+  const brand = 'bpjs';
 
   const getMeterDetail = async ({
     user_balance,
@@ -77,16 +77,16 @@ export default function InputMeterNumber({route, navigation}) {
     }
   };
 
-  const handlePostPaid = async (number, product_sku_code) => {
+  const handlePostPaid = async number => {
     try {
-      if (!number || number.length < 11 || number.length > 14) {
+      if (!number || number.length < 11 || number.length > 12) {
         Alert.alert('Masukkan nomor yang valid');
         return;
       }
 
       setLoading(true);
 
-      // const product_sku_code = product_sku_code;
+      const product_sku_code = 'plnpasca';
       let type = 'pascabayar';
 
       const dest_number = number;
@@ -167,18 +167,8 @@ export default function InputMeterNumber({route, navigation}) {
           <View style={styles.labelContainer}>
             <Text style={styles.label}>
               Pascabayar?{' '}
-              <TouchableOpacity
-                onPress={() => handlePostPaid(number, 'plnpasca')}>
+              <TouchableOpacity onPress={() => handlePostPaid(number)}>
                 <Text style={styles.link}>Bayar Tagihan</Text>
-              </TouchableOpacity>
-            </Text>
-          </View>
-          <View style={styles.labelContainer}>
-            <Text style={styles.label}>
-              Pasang Baru/Tabah Daya?{' '}
-              <TouchableOpacity
-                onPress={() => handlePostPaid(number, 'pln_nontaglis')}>
-                <Text style={styles.link}>Nontaglis</Text>
               </TouchableOpacity>
             </Text>
           </View>

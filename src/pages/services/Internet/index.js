@@ -45,9 +45,9 @@ const Internet = ({route, navigation}) => {
   const getFintech = async () => {
     setFintech([
       {
-        brand: 'Indohome & Speedy',
+        brand: 'Indihome & Speedy',
         code: 'pasca_int_indihome',
-        logo: Images.InternetLogo.speedyAndTelkomselLogo,
+        logo: Images.InternetLogo.speedyAndIndihomeLogo,
       },
       {
         brand: 'IConnect',

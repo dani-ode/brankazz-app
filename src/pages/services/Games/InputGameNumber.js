@@ -26,6 +26,8 @@ const InputGameNumber = ({route}) => {
   const navigation = useNavigation();
   const [number, setNumber] = useState(0);
 
+  const [serverId, setServerId] = useState(0);
+
   const [user, setUser] = useState({});
 
   const brand_lowerCase = brand.toLowerCase();
@@ -41,12 +43,17 @@ const InputGameNumber = ({route}) => {
     FintechLogo = Images.GameLogo.genshinImpactLogo;
   }
 
-  const handleProduct = async (by_type, number) => {
+  const handleProduct = async (by_type, number, serverId) => {
     // console.log(by_type, number, brandName);
 
     if (!number || number.length < 4) {
       Alert.alert('Masukkan nomor yang valid');
       return;
+    }
+
+    let full_number = number;
+    if (serverId) {
+      full_number = number + serverId;
     }
 
     // console.log(number.length);
@@ -55,12 +62,12 @@ const InputGameNumber = ({route}) => {
 
     const type = 'prabayar';
 
-    console.log(number, category, brand, by_type, type, user_balance);
+    console.log(full_number, category, brand, by_type, type, user_balance);
 
     // return;
 
     navigation.navigate('PriceList', {
-      number: number,
+      number: full_number,
       category: category,
       brand: brand,
       product_sku_code_type: by_type,
@@ -90,12 +97,24 @@ const InputGameNumber = ({route}) => {
           onChangeText={number => setNumber(number)}
           maxLength={20}
         />
+        {code === 'mlegend_' && (
+          <TextInput
+            keyboardType="numeric"
+            style={[styles.input, {marginTop: 15}]}
+            placeholder="Masukkan Server ID"
+            autoFocus={true}
+            placeholderTextColor={theme['color-primary-500']}
+            onChangeText={serverId => setServerId(serverId)}
+            maxLength={20}
+          />
+        )}
       </Card>
+
       {/* </View> */}
       <View style={styles.submitContainer}>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => handleProduct(code + 'r', number)}>
+          onPress={() => handleProduct(code + 'r', number, serverId)}>
           <Text style={styles.buttonText}>Lanjutkan</Text>
         </TouchableOpacity>
       </View>

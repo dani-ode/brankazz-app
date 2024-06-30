@@ -43,6 +43,7 @@ import Games from '../pages/services/Games';
 import InputGameNumber from '../pages/services/Games/InputGameNumber';
 import Internet from '../pages/services/Internet';
 import InputInternetNumber from '../pages/services/Internet/InputInternetNumber';
+import InputBpjsNumber from '../pages/services/bpjs/inputBpjsNumber';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -446,6 +447,17 @@ export class Routes extends Component {
             }}
           />
 
+          {/* BPJS */}
+          <Stack.Screen
+            name="ServiceInputBpjsNumber"
+            component={InputBpjsNumber}
+            options={{title: 'Masukkan Nomor'}}
+            initialParams={{
+              user_balance: '',
+              category: '',
+            }}
+          />
+
           {/* Internet Pascabayar */}
           <Stack.Screen
             name="ServiceInternet"
@@ -456,7 +468,6 @@ export class Routes extends Component {
               category: '',
             }}
           />
-
           <Stack.Screen
             name="ServiceInternetInputId"
             component={InputInternetNumber}

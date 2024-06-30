@@ -44,7 +44,7 @@ const InputEwalletNominal = ({route, navigation}) => {
   const [nominal, setNominal] = useState('');
   const [description, setDescription] = useState('');
 
-  const [isLoading, setLoading] = useState(true);
+  const [isLoading, setLoading] = useState(false);
 
   useEffect(() => {
     getUser();

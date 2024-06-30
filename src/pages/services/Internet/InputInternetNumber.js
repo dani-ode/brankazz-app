@@ -19,7 +19,7 @@ import {Image} from 'react-native';
 
 import Images from '../../../assets/images';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {account_ref} from '../../../api/transaction_api';
+import {account_ref, postpaid_inquiry} from '../../../api/transaction_api';
 import {Bounce} from 'react-native-animated-spinkit';
 
 const InputInternetNumber = ({route}) => {
@@ -35,7 +35,7 @@ const InputInternetNumber = ({route}) => {
 
   // Provider Logo
   if (code === 'pasca_int_indihome') {
-    FintechLogo = Images.InternetLogo.speedyAndTelkomselLogo;
+    FintechLogo = Images.InternetLogo.speedyAndIndihomeLogo;
   } else if (code === 'pasca_int_iconnet') {
     FintechLogo = Images.InternetLogo.iconnectLogo;
   } else if (code === 'pasca_int_myrebpubic') {
