@@ -1,5 +1,14 @@
-import {Alert, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React, {useState} from 'react';
+import {
+  Alert,
+  Modal,
+  PermissionsAndroid,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  Vibration,
+  View,
+} from 'react-native';
+import React, {useEffect, useState} from 'react';
 
 import {default as theme} from '../../../../theme.json';
 import {Card} from '@ui-kitten/components';
@@ -12,14 +21,43 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {Bounce} from 'react-native-animated-spinkit';
 
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
+import {
+  Camera,
+  useCameraDevice,
+  useCodeScanner,
+} from 'react-native-vision-camera';
+
 export default function InputMeterNumber({route, navigation}) {
+  useEffect(() => {
+    requestCameraPermission();
+
+    // getUser();
+
+    const interval = setInterval(() => {
+      // getUser();
+      setScanned(false);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, []);
   const {user_balance, category} = route.params;
   const [number, setNumber] = useState('');
   const [meter, setMeterDetail] = useState({});
 
   const [isLoading, setLoading] = useState(false);
 
+  const [cameraDevice, setCameraDevice] = useState(false);
+
+  const [modalVisible, setModalVisible] = useState(false);
+
   const brand = 'pln';
+
+  const device = useCameraDevice('back');
+
+  const [scanned, setScanned] = useState(false);
+
+  const cameraPermission = Camera.getCameraPermissionStatus();
 
   const getMeterDetail = async ({
     user_balance,
@@ -30,7 +68,7 @@ export default function InputMeterNumber({route, navigation}) {
     by_type,
   }) => {
     try {
-      if (number.length < 11 || number.length > 12) {
+      if (number.length < 11 || number.length > 13) {
         Alert.alert('Masukkan nomor yang valid');
         return;
       }
@@ -149,20 +187,133 @@ export default function InputMeterNumber({route, navigation}) {
     }
   };
 
+  // Camera
+  const requestCameraPermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+        // {
+        //   title: 'Izinkan Brankazz Mengakses Kamera',
+        //   message: 'Go to Settings > Permission Manager > Camera',
+
+        // },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        setCameraDevice(true);
+        console.log('You can use the camera');
+      } else {
+        console.log('Camera permission denied');
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+
+  const onBarCodeScanned = ({data}) => {
+    console.log(data);
+  };
+
+  const codeScanner = useCodeScanner({
+    codeTypes: ['qr', 'ean-13'],
+    onCodeScanned: codes => {
+      if (codes.length > 0 && !scanned) {
+        Vibration.vibrate(); // Vibrate upon successful scan
+        setScanned(true);
+
+        if (codes[0].value.length >= 10 && codes[0].value.length <= 15) {
+          setModalVisible(false);
+          // getMeterDetail({
+          //   user_balance: user_balance,
+          //   category: category,
+          //   brand: brand,
+          //   type: 'prabayar',
+          //   number: codes[0].value,
+          //   by_type: 'pln_r',
+          // });
+          setNumber(codes[0].value);
+        } else {
+          Alert.alert('Barcode tidak valid!');
+        }
+        console.log(codes[0].value);
+      }
+      return;
+    },
+  });
+
   return (
     <>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert('Modal has been closed.');
+          setModalVisible(!modalVisible);
+        }}>
+        <Camera
+          style={StyleSheet.absoluteFill}
+          // ref={cameraRef}
+          // onBarCodeScanned={handleBarCodeScanned}
+
+          //just one try
+          onBarCodeScanned={codeScanner ?? onBarCodeScanned}
+          device={device}
+          isActive={true}
+          codeScanner={codeScanner}
+        />
+        {/* <View style={styles.warapper} /> */}
+
+        {/* <Text>Qris</Text> */}
+
+        {/* Overlay Wrapper */}
+        <View style={styles.overlayWrapper}>
+          {/* Frame */}
+          <View style={styles.frame} />
+          {/* Text or any other content */}
+          <Text style={styles.overlayText}>
+            Tempatkan barcode di dalam bingkai
+          </Text>
+        </View>
+        {/* <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>Hello World!</Text>
+            <TouchableOpacity
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => setModalVisible(!modalVisible)}>
+              <Text style={styles.textStyle}>Hide Modal</Text>
+            </TouchableOpacity>
+          </View>
+        </View> */}
+      </Modal>
       <View style={styles.container}>
-        <View style={styles.row}>
+        <View>
           <Card style={styles.card}>
-            <TextInput
-              keyboardType="numeric"
-              style={styles.input}
-              placeholder="Masukkan nomor meter"
-              autoFocus={true}
-              placeholderTextColor={theme['color-primary-500']}
-              onChangeText={number => setNumber(number)}
-              maxLength={20}
-            />
+            <View style={styles.row}>
+              <View style={[styles.col, styles.inputContainer]}>
+                <TextInput
+                  keyboardType="numeric"
+                  style={styles.input}
+                  placeholder="Nomor meter"
+                  autoFocus={true}
+                  placeholderTextColor={theme['color-primary-500']}
+                  onChangeText={number => setNumber(number)}
+                  maxLength={20}
+                  value={number}
+                />
+              </View>
+
+              {/* Open camera */}
+              <TouchableOpacity
+                style={styles.buttonStyle}
+                activeOpacity={0.5}
+                onPress={() => {
+                  requestCameraPermission(), setModalVisible(true);
+                }}>
+                <Text style={styles.buttonTextStyle}>
+                  <MaterialCommunityIcons name="barcode" size={38} />
+                </Text>
+              </TouchableOpacity>
+            </View>
           </Card>
           <View style={styles.labelContainer}>
             <Text style={styles.label}>
@@ -231,9 +382,12 @@ const styles = StyleSheet.create({
     // position: 'relative',
   },
   row: {
-    // flexDirection: 'row',
+    flexDirection: 'row',
     // space between
-    // justifyContent: 'space-between',
+    justifyContent: 'space-between',
+  },
+  col: {
+    flexDirection: 'column',
   },
   card: {
     marginHorizontal: 25,
@@ -258,7 +412,18 @@ const styles = StyleSheet.create({
     elevation: 3,
     color: theme['color-dark-500'],
     paddingHorizontal: 20,
-    fontSize: 20,
+    fontSize: 17,
+    fontWeight: 'bold',
+  },
+  inputContainer: {
+    minWidth: '78%',
+  },
+
+  buttonStyle: {
+    // alignContent: 'flex-end',
+  },
+  buttonTextStyle: {
+    color: theme['color-secondary-800'],
     fontWeight: 'bold',
   },
 
@@ -306,5 +471,67 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: 'bold',
     color: theme['color-secondary-800'],
+  },
+
+  //Modal
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  // button: {
+  //   borderRadius: 20,
+  //   padding: 10,
+  //   elevation: 2,
+  // },
+  // buttonOpen: {
+  //   backgroundColor: '#F194FF',
+  // },
+  // buttonClose: {
+  //   backgroundColor: '#2196F3',
+  // },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+
+  //camera view
+  overlayWrapper: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    // backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  },
+  frame: {
+    borderWidth: 2,
+    borderColor: theme['color-primary-500'],
+    width: 250,
+    height: 250,
+  },
+  overlayText: {
+    marginTop: 10,
+    color: '#FFF',
+    // fontSize: 18,
   },
 });

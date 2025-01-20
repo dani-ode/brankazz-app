@@ -139,10 +139,36 @@ const user_fcm_token = async (user_id, fcm_token, userKey, userBearerToken) => {
   }
 };
 
+const user_resend_email_verification = async (userKey, userBearerToken) => {
+  try {
+    const config = {
+      headers: {
+        'Access-Key': BRANKAZZ_ACCESS_KEY,
+        'User-Key': userKey,
+        Authorization: `Bearer ${userBearerToken}`,
+      },
+    };
+
+    const bodyParameters = {};
+
+    console.log(bodyParameters);
+
+    const res = await ApiManager.post(
+      '/email/verify/resend',
+      bodyParameters,
+      config,
+    );
+    return res;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export {
   user_login,
   user_profile,
   user_update_profile,
   user_logout,
   user_fcm_token,
+  user_resend_email_verification,
 };

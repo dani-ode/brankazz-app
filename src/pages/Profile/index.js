@@ -15,7 +15,11 @@ import {
 } from 'react-native';
 
 import {default as theme} from '../../../theme.json';
-import {user_logout, user_profile} from '../../api/user_api';
+import {
+  user_logout,
+  user_profile,
+  user_resend_email_verification,
+} from '../../api/user_api';
 import {RefreshControl, TextInput} from 'react-native-gesture-handler';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -50,6 +54,9 @@ const ProfileScreen = ({navigation}) => {
   const [showQraton, setShowQraton] = useState(true);
 
   const [isLoading, setLoading] = useState(true);
+
+  const [resendEmailButtonClicked, setResendEmailButtonClicked] =
+    useState(false);
 
   const getUser = async () => {
     try {
@@ -277,7 +284,7 @@ const ProfileScreen = ({navigation}) => {
                       onPress: () => {
                         console.log('OK Pressed');
                         Linking.openURL(
-                          'https://github.com/dani-ode/brankazz-app/releases/download/v' +
+                          'https://github.com/dani-ode/brankazz-build/releases/download/v' +
                             res.data.data.version +
                             '/Brankazz.v' +
                             res.data.data.version +
@@ -324,6 +331,29 @@ const ProfileScreen = ({navigation}) => {
     const formattedValue = formatAmount(text);
     // console.log(formattedValue);
     setQratonAmount(formattedValue);
+  };
+
+  const handleResendEmail = async () => {
+    try {
+      const userId = await AsyncStorage.getItem('user-id');
+      const userKey = await AsyncStorage.getItem('user-key');
+      const userBearerToken = await AsyncStorage.getItem('bearer-token');
+      await user_resend_email_verification(userKey, userBearerToken).then(
+        res => {
+          console.log(res);
+
+          if (res) {
+            if (res.status === 200) {
+              Alert.alert('Email berhasil dikirim', 'Silahkan cek email Anda');
+            }
+          } else {
+            Alert.alert('Error', 'Koneksi Bermasalah');
+          }
+        },
+      );
+    } catch (error) {
+      console.error('Error sending email:', error);
+    }
   };
 
   const ContentThatGoesAboveTheFlatList = () => {
@@ -424,6 +454,13 @@ const ProfileScreen = ({navigation}) => {
                 {display: user.email_verified_at == null ? 'flex' : 'none'},
               ]}>
               - Email Anda ({user.email}) belum di verifikasi!
+              <TouchableOpacity
+                style={styles.buttonResend}
+                onPress={() => {
+                  handleResendEmail();
+                }}>
+                <Text style={styles.buttonTextResend}>Kirim Ulang</Text>
+              </TouchableOpacity>
             </Text>
             <Text
               style={[
@@ -761,6 +798,19 @@ const styles = StyleSheet.create({
     top: 10,
     right: 10,
     backgroundColor: theme['color-secondary-500'],
+  },
+
+  buttonResend: {
+    backgroundColor: theme['color-secondary-500'],
+    borderRadius: 10,
+    // padding: 10,
+    // marginTop: 10,
+    marginLeft: 10,
+  },
+  buttonTextResend: {
+    color: theme['color-secondary-800'],
+    fontWeight: 'bold',
+    fontSize: 10,
   },
 });
 

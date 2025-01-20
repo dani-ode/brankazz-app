@@ -26,6 +26,7 @@ import {RefreshControl} from 'react-native-gesture-handler';
 
 const HomeScreen = () => {
   useEffect(() => {
+    checkLoginExpiry();
     getUser();
     const interval = setInterval(() => {
       getUser();
@@ -38,6 +39,38 @@ const HomeScreen = () => {
   const [user, setUser] = useState({});
 
   const [isLoading, setLoading] = useState(true);
+
+  const checkLoginExpiry = async () => {
+    try {
+      const currentTimestamp = Math.floor(Date.now() / 1000); // get current UNIX timestamp. Divide by 1000 to get seconds and round it down
+
+      let expiryTime = await AsyncStorage.getItem('login-expiry-time');
+      // to integer
+
+      expiryTime = parseInt(expiryTime);
+
+      if (currentTimestamp >= parseInt(expiryTime)) {
+        await AsyncStorage.removeItem('user-id');
+        await AsyncStorage.removeItem('user-key');
+        await AsyncStorage.removeItem('bearer-token');
+
+        navigation.replace('Login');
+      } else {
+        // Re-set the login expiration time in minutes
+        const storageExpirationTimeInMinutes = 30; // in this case, we only want to keep the data for 30min
+        const now = new Date();
+        now.setMinutes(now.getMinutes() + storageExpirationTimeInMinutes); // add the expiration time to the current Date time
+        const loginExpiryTimeInTimestamp = Math.floor(now.getTime() / 1000); // convert the expiry time in UNIX timestamp
+        AsyncStorage.setItem(
+          'login-expiry-time',
+          loginExpiryTimeInTimestamp.toString(),
+        );
+        console.log('not expired, reset expiration time');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const getUser = async () => {
     try {
@@ -104,10 +137,10 @@ const HomeScreen = () => {
         <Layout style={styles.layout}>
           <View style={styles.header}>
             <View style={[styles.row, styles.headerTitle]}>
-              <View style={styles.col}>
+              <View style={(styles.col, styles.p1)}>
                 <Text style={styles.title}>Hi, {user.name} </Text>
               </View>
-              <View style={[styles.col, styles.deposit]}>
+              <View style={[styles.col, styles.p1, styles.deposit]}>
                 <Text style={styles.topIcons}>
                   <MaterialCommunityIcons
                     name="help-circle-outline"
@@ -119,12 +152,12 @@ const HomeScreen = () => {
               </View>
             </View>
             <View style={[styles.row, styles.headerBalance]}>
-              <View style={styles.col}>
+              <View style={(styles.col, styles.p1)}>
                 <Text category="h6" style={styles.balance}>
                   KMP {formatCurrency(parseInt(user.balance))},00
                 </Text>
               </View>
-              <View style={[styles.col, styles.deposit]}>
+              <View style={[styles.col, styles.p1, styles.deposit]}>
                 <TouchableOpacity style={styles.depositBtn}>
                   <View style={styles.row}>
                     <MaterialCommunityIcons
@@ -265,7 +298,7 @@ const HomeScreen = () => {
                     user_balance,
                   })
                 }>
-                <View style={[styles.col]}>
+                <View style={[styles.col, styles.p1]}>
                   <View style={[styles.serviceIcon, styles.serviceItemAll]}>
                     <MaterialCommunityIcons
                       name="wallet"
@@ -276,7 +309,7 @@ const HomeScreen = () => {
                   <Text style={styles.serviceTextAll}>E-Wallet</Text>
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 style={styles.service}
                 onPress={() =>
                   handleService({
@@ -286,7 +319,7 @@ const HomeScreen = () => {
                     user_balance,
                   })
                 }>
-                <View style={[styles.col]}>
+                <View style={[styles.col, styles.p1]}>
                   <View style={[styles.serviceIcon, styles.serviceItemAll]}>
                     <MaterialCommunityIcons
                       name="bank"
@@ -296,9 +329,9 @@ const HomeScreen = () => {
                   </View>
                   <Text style={styles.serviceTextAll}>Bank</Text>
                 </View>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
 
-              {/* <TouchableOpacity
+              <TouchableOpacity
                 style={styles.service}
                 onPress={() =>
                   Alert.alert(
@@ -306,7 +339,7 @@ const HomeScreen = () => {
                     'Fitur ini sedang dalam tahap pengembangan',
                   )
                 }>
-                <View style={[styles.col]}>
+                <View style={[styles.col, styles.p1]}>
                   <View style={[styles.serviceIcon, styles.serviceItemAll]}>
                     <MaterialCommunityIcons
                       name="ticket"
@@ -318,7 +351,7 @@ const HomeScreen = () => {
                 </View>
               </TouchableOpacity>
 
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 style={styles.service}
                 onPress={() =>
                   Alert.alert(
@@ -326,7 +359,7 @@ const HomeScreen = () => {
                     'Fitur ini sedang dalam tahap pengembangan',
                   )
                 }>
-                <View style={[styles.col]}>
+                <View style={[styles.col, styles.p1]}>
                   <View style={[styles.serviceIcon, styles.serviceItemAll]}>
                     <MaterialCommunityIcons
                       name="calendar-clock"
@@ -348,7 +381,7 @@ const HomeScreen = () => {
                     user_balance,
                   })
                 }>
-                <View style={[styles.col]}>
+                <View style={[styles.col, styles.p1]}>
                   <View style={[styles.serviceIcon, styles.serviceItemAll]}>
                     <MaterialCommunityIcons
                       name="cellphone"
@@ -369,7 +402,7 @@ const HomeScreen = () => {
                     user_balance,
                   })
                 }>
-                <View style={[styles.col]}>
+                <View style={[styles.col, styles.p1]}>
                   <View style={[styles.serviceIcon, styles.serviceItemAll]}>
                     <MaterialCommunityIcons
                       name="gamepad"
@@ -399,7 +432,7 @@ const HomeScreen = () => {
                     'Fitur ini sedang dalam tahap pengembangan',
                   )
                 }>
-                <View style={[styles.col]}>
+                <View style={[styles.col, styles.p1]}>
                   <View style={[styles.serviceIcon, styles.serviceItemAll]}>
                     <MaterialCommunityIcons
                       name="hospital"
@@ -421,7 +454,7 @@ const HomeScreen = () => {
                     user_balance,
                   })
                 }>
-                <View style={[styles.col]}>
+                <View style={[styles.col, styles.p1]}>
                   <View style={[styles.serviceIcon, styles.serviceItemAll]}>
                     <MaterialCommunityIcons
                       name="server-network"
@@ -441,7 +474,7 @@ const HomeScreen = () => {
                     'Fitur ini sedang dalam tahap pengembangan',
                   )
                 }>
-                <View style={[styles.col]}>
+                <View style={[styles.col, styles.p1]}>
                   <View style={[styles.serviceIcon, styles.serviceItemAll]}>
                     <MaterialCommunityIcons
                       name="television-classic"
@@ -458,7 +491,7 @@ const HomeScreen = () => {
                 onPress={() =>
                   Alert.alert('Coming Soon', 'Belum ada fitur lainnya')
                 }>
-                <View style={[styles.col]}>
+                <View style={[styles.col, styles.p1]}>
                   <View style={[styles.serviceIcon, styles.serviceItemAll]}>
                     <MaterialCommunityIcons
                       name="format-list-bulleted"
@@ -529,6 +562,9 @@ const styles = StyleSheet.create({
     // flex: 1,
     // alignItems: 'center',
     // justifyContent: 'center',
+    flexDirection: 'column',
+  },
+  p1: {
     padding: 10, // Add your styles here
   },
   card: {
@@ -607,8 +643,8 @@ const styles = StyleSheet.create({
 
   serviceList: {
     justifyContent: 'space-between',
-    flexDirection: 'row',
-
+    paddingTop: 10,
+    paddingBottom: 10,
     // backgroundColor: 'red',
   },
   service: {

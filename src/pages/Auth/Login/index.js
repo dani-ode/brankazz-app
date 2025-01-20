@@ -89,7 +89,7 @@ class Login extends React.Component {
           console.log(res);
           if (res) {
             if (res.status === 200) {
-              console.log('stroed user');
+              console.log('stored user');
 
               const userId = res.data.data.id;
               const userKey = res.data.data.key;
@@ -98,6 +98,19 @@ class Login extends React.Component {
               AsyncStorage.setItem('user-id', JSON.stringify(userId));
               AsyncStorage.setItem('user-key', userKey);
               AsyncStorage.setItem('bearer-token', userBearerToken);
+
+              // Set the login expiration time in minutes
+              const storageExpirationTimeInMinutes = 30; // in this case, we only want to keep the data for 30min
+              const now = new Date();
+              now.setMinutes(now.getMinutes() + storageExpirationTimeInMinutes); // add the expiration time to the current Date time
+              const loginExpiryTimeInTimestamp = Math.floor(
+                now.getTime() / 1000,
+              ); // convert the expiry time in UNIX timestamp
+              AsyncStorage.setItem(
+                'login-expiry-time',
+                loginExpiryTimeInTimestamp.toString(),
+              );
+
               // console.log(res.data.data);
 
               // set user personal FCM Token

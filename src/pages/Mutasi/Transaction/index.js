@@ -151,7 +151,7 @@ const MutasiItem = ({mutasi, onPress}) => {
       style={{marginTop: 15, marginHorizontal: 15}}>
       <Card style={{backgroundColor: '#F1F5F7'}}>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <View style={{flexDirection: 'column'}}>
+          <View style={{flexDirection: 'column', maxWidth: '78%'}}>
             <Text style={{color: '#2e3d49', fontWeight: 'bold'}}>
               {formatCurrency(mutasi.price)}
             </Text>
